@@ -1,4 +1,12 @@
-import { DependencyNotFoundError } from "./errors";
+import { declareDependency, DependencyNotFoundError } from "./utils";
+
+describe("declareDependency", () => {
+  const arg = () => ({ a: 1 });
+
+  it("should pass it's argument through", () => {
+    expect(declareDependency(arg)).toBe(arg);
+  });
+});
 
 describe("DependencyNotFoundError", () => {
   describe("when called with a string", () => {

@@ -1,5 +1,5 @@
 import { ID, FactoryOf } from "./types";
-import { DependencyNotFoundError } from "./errors";
+import { DependencyNotFoundError } from "./utils";
 
 export class Container {
   /**
