@@ -1,6 +1,9 @@
 import { ID, FactoryOf } from "./types";
 import { DependencyNotFoundError } from "./utils";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyDependencyDeclaration = FactoryOf<any>;
+
 export class Container {
   /**
    * Parent container.
@@ -10,7 +13,7 @@ export class Container {
   public parent?: Container;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private readonly dependencies: Record<ID, FactoryOf<any>> = {};
+  private readonly dependencies: Record<ID, AnyDependencyDeclaration> = {};
 
   /**
    * Register a new dependency
@@ -21,18 +24,10 @@ export class Container {
   }
 
   /**
-   * Creates and returns a child container
-   */
-  public createChild(): Container {
-    const childContainer = new Container();
-    childContainer.parent = this;
-    return childContainer;
-  }
-
-  /**
    * Get a dependency from local or parent's dependencies
    */
-  private _get(id: ID): FactoryOf<any> | undefined {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private _get(id: ID): AnyDependencyDeclaration | undefined {
     return this.dependencies[id] ?? this.parent?._get(id);
   }
 
@@ -44,5 +39,14 @@ export class Container {
     if (typeof dependency !== "function") throw new DependencyNotFoundError(id);
 
     return dependency({ get: this.get.bind(this) });
+  }
+
+  /**
+   * Creates and returns a child container
+   */
+  public createChild(): Container {
+    const childContainer = new Container();
+    childContainer.parent = this;
+    return childContainer;
   }
 }
