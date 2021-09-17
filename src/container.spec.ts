@@ -40,7 +40,7 @@ describe("Container", () => {
 
     describe("when asked for an unknown dependency", () => {
       it("should throw an error", () => {
-        expect(() => container.get<Adder>("banana")).toThrow(
+        expect(() => container.get<Adder>("banana")).toThrowError(
           DependencyNotFoundError
         );
       });
@@ -90,9 +90,94 @@ describe("Container", () => {
 
     describe("when asked for an unknown dependency", () => {
       it("should throw an error", () => {
-        expect(() => container.get<Adder>(Symbol.for("potatis"))).toThrow(
+        expect(() => container.get(Symbol.for("potato"))).toThrowError(
           DependencyNotFoundError
         );
+      });
+    });
+  });
+
+  describe("when creating a child container", () => {
+    // Dependency declarations
+    const MESSAGES = Symbol.for("messages");
+    interface Messages {
+      welcome: string;
+    }
+
+    const NUMBERS = Symbol.for("numbers");
+    interface Numbers {
+      PI: number;
+    }
+
+    // Dependency implementations
+    const messages = declareDependency(
+      (): Messages => ({
+        welcome: "Hello",
+      })
+    );
+
+    const numbers = declareDependency(
+      (): Numbers => ({
+        PI: 3.14,
+      })
+    );
+
+    // Root container dependency bindings
+    const container = new Container();
+    container.bind<Messages>(MESSAGES, messages);
+
+    describe("when asked for a known dependency", () => {
+      const dependency = container.get<Messages>(MESSAGES);
+      it("should return it", () => {
+        expect(dependency.welcome).toBe("Hello");
+      });
+    });
+
+    describe("when asked for an unknown dependency", () => {
+      it("should throw an error", () => {
+        expect(() => container.get<Numbers>(NUMBERS)).toThrowError(
+          DependencyNotFoundError
+        );
+      });
+    });
+
+    describe("when a child container is created", () => {
+      const childContainer = container.createChild();
+
+      it("should return a new container", () => {
+        expect(childContainer).toBeInstanceOf(Container);
+      });
+
+      describe("when a new dependency is bound in the child container", () => {
+        childContainer.bind<Numbers>(NUMBERS, numbers);
+
+        describe("when a grandchild container is created", () => {
+          const grandChildContainer = childContainer.createChild();
+
+          describe("when asked for a dependency in the child container, from the grandchild container", () => {
+            const dependency = grandChildContainer.get<Numbers>(NUMBERS);
+
+            it("should return it", () => {
+              expect(dependency.PI).toBe(3.14);
+            });
+          });
+
+          describe("when asked for a dependency in the root container, from the grandchild container", () => {
+            const dependency = grandChildContainer.get<Messages>(MESSAGES);
+
+            it("should return it", () => {
+              expect(dependency.welcome).toBe("Hello");
+            });
+          });
+
+          describe("when asked for an unknown dependency, from the grandchild container", () => {
+            it("should throw an error", () => {
+              expect(() => grandChildContainer.get("potato")).toThrowError(
+                DependencyNotFoundError
+              );
+            });
+          });
+        });
       });
     });
   });
