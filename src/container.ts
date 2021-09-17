@@ -12,7 +12,6 @@ export class Container {
    */
   public parent?: Container;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private readonly dependencies: Record<ID, AnyDependencyDeclaration> = {};
 
   /**
@@ -26,7 +25,6 @@ export class Container {
   /**
    * Get a dependency from local or parent's dependencies
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _get(id: ID): AnyDependencyDeclaration | undefined {
     return this.dependencies[id] ?? this.parent?._get(id);
   }
