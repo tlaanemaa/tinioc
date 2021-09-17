@@ -18,7 +18,7 @@ describe("Container", () => {
     return { add };
   });
 
-  const numberCarrier = declareDependency(({ get }): NumberCarrier => {
+  const numberCarrier = declareDependency((): NumberCarrier => {
     return { num2: 5 };
   });
 
