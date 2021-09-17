@@ -1,4 +1,5 @@
 import { ID, FactoryOf } from "./types";
+import { DependencyNotFoundError } from "./errors";
 
 export class Container {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,8 +29,7 @@ export class Container {
    */
   public get<T>(id: ID): T {
     const dependency = this.dependencies[id];
-    if (dependency === undefined)
-      throw new Error(`Dependency "${String(id)}" not found!`);
+    if (dependency === undefined) throw new DependencyNotFoundError(id);
 
     return dependency({ get: this.get.bind(this) });
   }
