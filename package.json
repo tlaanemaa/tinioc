@@ -1,5 +1,5 @@
 {
-  "name": "tinydi",
+  "name": "tinioc",
   "version": "0.0.0",
   "description": "A tiny dependency injection library for all coding styles",
   "main": "./dist/main.js",
@@ -21,20 +21,29 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tlaanemaa/tinyDI.git"
+    "url": "git+https://github.com/tlaanemaa/tinioc.git"
   },
   "keywords": [
+    "ioc",
+    "di",
+    "javascript",
+    "typescript",
+    "node",
     "dependency",
     "injection",
-    "dependency-injection",
-    "tiny"
+    "dependency injection",
+    "inversion",
+    "control",
+    "inversion of control",
+    "tiny",
+    "small"
   ],
   "author": "Taavi Laanemaa <taavi.laanemaa@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tlaanemaa/tinyDI/issues"
+    "url": "https://github.com/tlaanemaa/tinioc/issues"
   },
-  "homepage": "https://github.com/tlaanemaa/tinyDI#readme",
+  "homepage": "https://github.com/tlaanemaa/tinioc#readme",
   "devDependencies": {
     "@types/jest": "^27.0.1",
     "@typescript-eslint/eslint-plugin": "^4.31.1",
