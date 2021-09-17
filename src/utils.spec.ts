@@ -20,4 +20,16 @@ describe("DependencyNotFoundError", () => {
       expect(error.message).toBe('Dependency "banana" not found!');
     });
   });
+
+  describe("when called with a symbol", () => {
+    const error = new DependencyNotFoundError(Symbol.for("aliens"));
+
+    it("should return an error", () => {
+      expect(error).toBeInstanceOf(Error);
+    });
+
+    it("should contain that string in it's message", () => {
+      expect(error.message).toBe('Dependency "Symbol(aliens)" not found!');
+    });
+  });
 });
