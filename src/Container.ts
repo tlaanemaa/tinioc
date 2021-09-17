@@ -2,6 +2,13 @@ import { ID, FactoryOf } from "./types";
 import { DependencyNotFoundError } from "./errors";
 
 export class Container {
+  /**
+   * Parent container.
+   *
+   * Any dependency that is not found in this container will be looked for in the parent, if it exists.
+   */
+  public parent?: Container;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private readonly dependencies: Record<ID, FactoryOf<any>> = {};
 
@@ -14,22 +21,27 @@ export class Container {
   }
 
   /**
-   * Returns a cloned instance of the container
+   * Creates and returns a child container
    */
-  public clone(): Container {
-    const clonedContainer = new Container();
-    Object.entries(this.dependencies).forEach(([id, dependency]) =>
-      clonedContainer.register(id, dependency)
-    );
-    return clonedContainer;
+  public createChild(): Container {
+    const childContainer = new Container();
+    childContainer.parent = this;
+    return childContainer;
+  }
+
+  /**
+   * Get a dependency from local or parent's dependencies
+   */
+  private getDependency(id: ID): FactoryOf<any> | undefined {
+    return this.dependencies[id] ?? this.parent?.getDependency(id);
   }
 
   /**
    * Get a dependency
    */
   public get<T>(id: ID): T {
-    const dependency = this.dependencies[id];
-    if (dependency === undefined) throw new DependencyNotFoundError(id);
+    const dependency = this.getDependency(id);
+    if (typeof dependency !== "function") throw new DependencyNotFoundError(id);
 
     return dependency({ get: this.get.bind(this) });
   }
