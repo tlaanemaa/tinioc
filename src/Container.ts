@@ -15,7 +15,7 @@ export class Container {
   /**
    * Register a new dependency
    */
-  public register<T>(id: ID, dependency: FactoryOf<T>): this {
+  public bind<T>(id: ID, dependency: FactoryOf<T>): this {
     this.dependencies[id] = dependency;
     return this;
   }
@@ -32,15 +32,15 @@ export class Container {
   /**
    * Get a dependency from local or parent's dependencies
    */
-  private getDependency(id: ID): FactoryOf<any> | undefined {
-    return this.dependencies[id] ?? this.parent?.getDependency(id);
+  private _get(id: ID): FactoryOf<any> | undefined {
+    return this.dependencies[id] ?? this.parent?._get(id);
   }
 
   /**
    * Get a dependency
    */
   public get<T>(id: ID): T {
-    const dependency = this.getDependency(id);
+    const dependency = this._get(id);
     if (typeof dependency !== "function") throw new DependencyNotFoundError(id);
 
     return dependency({ get: this.get.bind(this) });
