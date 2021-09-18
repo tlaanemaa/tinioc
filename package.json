@@ -1,6 +1,6 @@
 {
   "name": "tinioc",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A tiny inversion of control container for all coding styles",
   "main": "./dist/main.js",
   "types": "./dist/main.d.ts",
