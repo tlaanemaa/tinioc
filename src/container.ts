@@ -46,7 +46,7 @@ export class Container {
     const binding = this._get(id);
     if (typeof binding !== "function") throw new BindingNotFoundError(id);
 
-    return binding({ get: this.get.bind(this) });
+    return binding({ inject: this.get.bind(this) });
   }
 
   /**

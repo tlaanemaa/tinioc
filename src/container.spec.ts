@@ -15,8 +15,8 @@ describe("Container", () => {
     }
 
     // Binding implementations
-    const adder = declareInjectable(({ get }): Adder => {
-      const numberCarrier = get<NumberCarrier>(NUMBER_CARRIER);
+    const adder = declareInjectable(({ inject }): Adder => {
+      const numberCarrier = inject<NumberCarrier>(NUMBER_CARRIER);
       const add = (number: number) => number + numberCarrier.num2;
       return { add };
     });
@@ -61,15 +61,15 @@ describe("Container", () => {
     }
 
     // Binding implementations
-    const adder = declareInjectable(({ get }): Adder => {
-      const numberCarrier = get<NumberCarrier>(NUMBER_CARRIER);
+    const adder = declareInjectable(({ inject }): Adder => {
+      const numberCarrier = inject<NumberCarrier>(NUMBER_CARRIER);
       const add = (number: number) => number + numberCarrier.getNum2();
       return { add, baseValue: 3 };
     });
 
-    const numberCarrier = declareInjectable(({ get }): NumberCarrier => {
+    const numberCarrier = declareInjectable(({ inject }): NumberCarrier => {
       const getNum2 = () => {
-        const adder = get<Adder>(ADDER);
+        const adder = inject<Adder>(ADDER);
         return adder.baseValue + 1;
       };
       return { getNum2 };

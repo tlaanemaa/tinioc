@@ -8,7 +8,7 @@ export type ID = string | symbol;
  * This is the context that gets passed into each dependency on initialization
  */
 export type Context = {
-  readonly get: <T>(id: ID) => T;
+  readonly inject: <T>(id: ID) => T;
 };
 
 /**
