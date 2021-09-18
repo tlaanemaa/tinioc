@@ -1,35 +1,35 @@
-import { declareDependency, DependencyNotFoundError } from "./utils";
+import { declareInjectable, BindingNotFoundError } from "./utils";
 
-describe("declareDependency", () => {
+describe("declareInjectable", () => {
   const arg = () => ({ a: 1 });
 
   it("should pass it's argument through", () => {
-    expect(declareDependency(arg)).toBe(arg);
+    expect(declareInjectable(arg)).toBe(arg);
   });
 });
 
-describe("DependencyNotFoundError", () => {
+describe("BindingNotFoundError", () => {
   describe("when called with a string", () => {
-    const error = new DependencyNotFoundError("banana");
+    const error = new BindingNotFoundError("banana");
 
     it("should return an error", () => {
       expect(error).toBeInstanceOf(Error);
     });
 
     it("should contain that string in it's message", () => {
-      expect(error.message).toBe('Dependency "banana" not found!');
+      expect(error.message).toBe('Binding "banana" not found!');
     });
   });
 
   describe("when called with a symbol", () => {
-    const error = new DependencyNotFoundError(Symbol.for("aliens"));
+    const error = new BindingNotFoundError(Symbol.for("aliens"));
 
     it("should return an error", () => {
       expect(error).toBeInstanceOf(Error);
     });
 
     it("should contain that string in it's message", () => {
-      expect(error.message).toBe('Dependency "Symbol(aliens)" not found!');
+      expect(error.message).toBe('Binding "Symbol(aliens)" not found!');
     });
   });
 });

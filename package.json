@@ -1,7 +1,7 @@
 {
   "name": "tinioc",
   "version": "0.0.1",
-  "description": "A tiny dependency injection library for all coding styles",
+  "description": "A tiny inversion of control container for all coding styles",
   "main": "./dist/main.js",
   "types": "./dist/main.d.ts",
   "engines": {

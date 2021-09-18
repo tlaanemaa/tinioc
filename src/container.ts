@@ -1,52 +1,52 @@
 import { ID, FactoryOf } from "./types";
-import { DependencyNotFoundError } from "./utils";
+import { BindingNotFoundError } from "./utils";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyDependencyDeclaration = FactoryOf<any>;
+type AnyBindingDeclaration = FactoryOf<any>;
 
 export class Container {
   /**
    * Parent container.
    *
-   * Any dependency that is not found in this container will be looked for in the parent, if it exists.
+   * Any binding that is not found in this container will be looked for in the parent, if it exists.
    */
   public parent?: Container;
 
-  private readonly dependencies: Record<ID, AnyDependencyDeclaration> = {};
+  private readonly bindings: Record<ID, AnyBindingDeclaration> = {};
 
   /**
-   * Returns all dependency IDs currently kept in this container
+   * Returns all binding IDs currently kept in this container
    */
-  private getDependencyIds() {
+  private getBindingIds() {
     return [
-      ...Object.getOwnPropertySymbols(this.dependencies),
-      ...Object.getOwnPropertyNames(this.dependencies),
+      ...Object.getOwnPropertySymbols(this.bindings),
+      ...Object.getOwnPropertyNames(this.bindings),
     ];
   }
 
   /**
-   * Register a new dependency
+   * Register a new binding
    */
-  public bind<T>(id: ID, dependency: FactoryOf<T>): this {
-    this.dependencies[id] = dependency;
+  public bind<T>(id: ID, value: FactoryOf<T>): this {
+    this.bindings[id] = value;
     return this;
   }
 
   /**
-   * Get a dependency from local or parent's dependencies
+   * Get a binding from local or parent's bindings
    */
-  private _get(id: ID): AnyDependencyDeclaration | undefined {
-    return this.dependencies[id] ?? this.parent?._get(id);
+  private _get(id: ID): AnyBindingDeclaration | undefined {
+    return this.bindings[id] ?? this.parent?._get(id);
   }
 
   /**
-   * Get a dependency
+   * Get a binding
    */
   public get<T>(id: ID): T {
-    const dependency = this._get(id);
-    if (typeof dependency !== "function") throw new DependencyNotFoundError(id);
+    const binding = this._get(id);
+    if (typeof binding !== "function") throw new BindingNotFoundError(id);
 
-    return dependency({ get: this.get.bind(this) });
+    return binding({ get: this.get.bind(this) });
   }
 
   /**
@@ -61,17 +61,17 @@ export class Container {
   /**
    * Merge given containers together into a new container.
    * The new container will have no relation to the provided containers,
-   * its a fresh copy with all the dependencies rebound to it.
+   * its a fresh copy with all the bindings rebound to it.
    *
-   * **PS!** Only dependencies from the containers themselves will be copied.
+   * **PS!** Only bindings from the containers themselves will be copied.
    * The parents of the containers will not be looked at.
    */
   static merge(...containers: Container[]): Container {
     const mergedContainer = new Container();
 
     containers.forEach((container) => {
-      container.getDependencyIds().forEach((id) => {
-        mergedContainer.bind(id, container.dependencies[id]);
+      container.getBindingIds().forEach((id) => {
+        mergedContainer.bind(id, container.bindings[id]);
       });
     });
 

@@ -1,9 +1,9 @@
 import { Container } from "./container";
-import { declareDependency, DependencyNotFoundError } from "./utils";
+import { declareInjectable, BindingNotFoundError } from "./utils";
 
 describe("Container", () => {
-  describe("when used with simple dependency relationships", () => {
-    // Dependency declarations
+  describe("when used with simple binding relationships", () => {
+    // Binding declarations
     const ADDER = Symbol.for("adder");
     interface Adder {
       add(number: number): number;
@@ -14,41 +14,41 @@ describe("Container", () => {
       num2: number;
     }
 
-    // Dependency implementations
-    const adder = declareDependency(({ get }): Adder => {
+    // Binding implementations
+    const adder = declareInjectable(({ get }): Adder => {
       const numberCarrier = get<NumberCarrier>(NUMBER_CARRIER);
       const add = (number: number) => number + numberCarrier.num2;
       return { add };
     });
 
-    const numberCarrier = declareDependency((): NumberCarrier => {
+    const numberCarrier = declareInjectable((): NumberCarrier => {
       return { num2: 5 };
     });
 
-    // Dependency bindings
+    // Binding bindings
     const container = new Container();
     container.bind<Adder>(ADDER, adder);
     container.bind<NumberCarrier>(NUMBER_CARRIER, numberCarrier);
 
-    describe("when asked for a known dependency", () => {
-      const dependency = container.get<Adder>(ADDER);
+    describe("when asked for a known binding", () => {
+      const binding = container.get<Adder>(ADDER);
 
-      it("should return that dependency and resolve it's dependencies", () => {
-        expect(dependency.add(7)).toBe(5 + 7);
+      it("should return that binding and resolve it's bindings", () => {
+        expect(binding.add(7)).toBe(5 + 7);
       });
     });
 
-    describe("when asked for an unknown dependency", () => {
+    describe("when asked for an unknown binding", () => {
       it("should throw an error", () => {
         expect(() => container.get<Adder>("banana")).toThrowError(
-          DependencyNotFoundError
+          BindingNotFoundError
         );
       });
     });
   });
 
-  describe("when used with circular dependency relationships", () => {
-    // Dependency declarations
+  describe("when used with circular binding relationships", () => {
+    // Binding declarations
     const ADDER = Symbol.for("adder");
     interface Adder {
       baseValue: number;
@@ -60,14 +60,14 @@ describe("Container", () => {
       getNum2(): number;
     }
 
-    // Dependency implementations
-    const adder = declareDependency(({ get }): Adder => {
+    // Binding implementations
+    const adder = declareInjectable(({ get }): Adder => {
       const numberCarrier = get<NumberCarrier>(NUMBER_CARRIER);
       const add = (number: number) => number + numberCarrier.getNum2();
       return { add, baseValue: 3 };
     });
 
-    const numberCarrier = declareDependency(({ get }): NumberCarrier => {
+    const numberCarrier = declareInjectable(({ get }): NumberCarrier => {
       const getNum2 = () => {
         const adder = get<Adder>(ADDER);
         return adder.baseValue + 1;
@@ -75,30 +75,30 @@ describe("Container", () => {
       return { getNum2 };
     });
 
-    // Dependency bindings
+    // Binding bindings
     const container = new Container();
     container.bind<Adder>(ADDER, adder);
     container.bind<NumberCarrier>(NUMBER_CARRIER, numberCarrier);
 
-    describe("when asked for a known dependency", () => {
-      const dependency = container.get<Adder>(ADDER);
+    describe("when asked for a known binding", () => {
+      const binding = container.get<Adder>(ADDER);
 
-      it("should return that dependency and resolve it's dependencies", () => {
-        expect(dependency.add(7)).toBe(3 + 1 + 7);
+      it("should return that binding and resolve it's bindings", () => {
+        expect(binding.add(7)).toBe(3 + 1 + 7);
       });
     });
 
-    describe("when asked for an unknown dependency", () => {
+    describe("when asked for an unknown binding", () => {
       it("should throw an error", () => {
         expect(() => container.get(Symbol.for("potato"))).toThrowError(
-          DependencyNotFoundError
+          BindingNotFoundError
         );
       });
     });
   });
 
   describe("when a child container is created", () => {
-    // Dependency declarations
+    // Binding declarations
     const MESSAGES = Symbol.for("messages");
     interface Messages {
       welcome: string;
@@ -109,20 +109,20 @@ describe("Container", () => {
       PI: number;
     }
 
-    // Dependency implementations
-    const messages = declareDependency(
+    // Binding implementations
+    const messages = declareInjectable(
       (): Messages => ({
         welcome: "Hello",
       })
     );
 
-    const numbers = declareDependency(
+    const numbers = declareInjectable(
       (): Numbers => ({
         PI: 3.14,
       })
     );
 
-    // Root container dependency bindings
+    // Root container binding bindings
     const container = new Container();
     container.bind<Messages>(MESSAGES, messages);
     const childContainer = container.createChild();
@@ -131,32 +131,32 @@ describe("Container", () => {
       expect(childContainer).toBeInstanceOf(Container);
     });
 
-    describe("when a new dependency is bound in the child container", () => {
+    describe("when a new binding is bound in the child container", () => {
       childContainer.bind<Numbers>(NUMBERS, numbers);
 
       describe("when a grandchild container is created", () => {
         const grandChildContainer = childContainer.createChild();
 
-        describe("when asked for a dependency in the child container, from the grandchild container", () => {
-          const dependency = grandChildContainer.get<Numbers>(NUMBERS);
+        describe("when asked for a binding in the child container, from the grandchild container", () => {
+          const binding = grandChildContainer.get<Numbers>(NUMBERS);
 
           it("should return it", () => {
-            expect(dependency.PI).toBe(3.14);
+            expect(binding.PI).toBe(3.14);
           });
         });
 
-        describe("when asked for a dependency in the root container, from the grandchild container", () => {
-          const dependency = grandChildContainer.get<Messages>(MESSAGES);
+        describe("when asked for a binding in the root container, from the grandchild container", () => {
+          const binding = grandChildContainer.get<Messages>(MESSAGES);
 
           it("should return it", () => {
-            expect(dependency.welcome).toBe("Hello");
+            expect(binding.welcome).toBe("Hello");
           });
         });
 
-        describe("when asked for an unknown dependency, from the grandchild container", () => {
+        describe("when asked for an unknown binding, from the grandchild container", () => {
           it("should throw an error", () => {
             expect(() => grandChildContainer.get("potato")).toThrowError(
-              DependencyNotFoundError
+              BindingNotFoundError
             );
           });
         });
@@ -165,7 +165,7 @@ describe("Container", () => {
   });
 
   describe("when containers are merged", () => {
-    // Dependency declarations
+    // Binding declarations
     const MESSAGES = Symbol.for("messages");
     interface Messages {
       welcome: string;
@@ -176,20 +176,20 @@ describe("Container", () => {
       PI: number;
     }
 
-    // Dependency implementations
-    const messages = declareDependency(
+    // Binding implementations
+    const messages = declareInjectable(
       (): Messages => ({
         welcome: "Hello",
       })
     );
 
-    const numbers = declareDependency(
+    const numbers = declareInjectable(
       (): Numbers => ({
         PI: 3.14,
       })
     );
 
-    // Container dependency bindings
+    // Container binding bindings
     const container1 = new Container();
     container1.bind<Messages>(MESSAGES, messages);
 
@@ -198,19 +198,19 @@ describe("Container", () => {
 
     const mergedContainer = Container.merge(container1, container2);
 
-    describe("when asked for dependency from container 1", () => {
-      const dependency = mergedContainer.get<Messages>(MESSAGES);
+    describe("when asked for binding from container 1", () => {
+      const binding = mergedContainer.get<Messages>(MESSAGES);
 
       it("should return it", () => {
-        expect(dependency.welcome).toBe("Hello");
+        expect(binding.welcome).toBe("Hello");
       });
     });
 
-    describe("when asked for dependency from container 2", () => {
-      const dependency = mergedContainer.get<Numbers>(NUMBERS);
+    describe("when asked for binding from container 2", () => {
+      const binding = mergedContainer.get<Numbers>(NUMBERS);
 
       it("should return it", () => {
-        expect(dependency.PI).toBe(3.14);
+        expect(binding.PI).toBe(3.14);
       });
     });
   });
