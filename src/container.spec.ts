@@ -163,4 +163,55 @@ describe("Container", () => {
       });
     });
   });
+
+  describe("when containers are merged", () => {
+    // Dependency declarations
+    const MESSAGES = Symbol.for("messages");
+    interface Messages {
+      welcome: string;
+    }
+
+    const NUMBERS = "numbers";
+    interface Numbers {
+      PI: number;
+    }
+
+    // Dependency implementations
+    const messages = declareDependency(
+      (): Messages => ({
+        welcome: "Hello",
+      })
+    );
+
+    const numbers = declareDependency(
+      (): Numbers => ({
+        PI: 3.14,
+      })
+    );
+
+    // Container dependency bindings
+    const container1 = new Container();
+    container1.bind<Messages>(MESSAGES, messages);
+
+    const container2 = new Container();
+    container2.bind<Numbers>(NUMBERS, numbers);
+
+    const mergedContainer = Container.merge(container1, container2);
+
+    describe("when asked for dependency from container 1", () => {
+      const dependency = mergedContainer.get<Messages>(MESSAGES);
+
+      it("should return it", () => {
+        expect(dependency.welcome).toBe("Hello");
+      });
+    });
+
+    describe("when asked for dependency from container 2", () => {
+      const dependency = mergedContainer.get<Numbers>(NUMBERS);
+
+      it("should return it", () => {
+        expect(dependency.PI).toBe(3.14);
+      });
+    });
+  });
 });
