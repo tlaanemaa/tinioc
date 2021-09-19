@@ -1,5 +1,5 @@
-import { Container } from "./container";
-import { declareInjectable, BindingNotFoundError } from "./utils";
+import { Container, Inject } from "./container";
+import { BindingNotFoundError } from "./utils";
 
 describe("Container", () => {
   describe("when used with simple binding relationships", () => {
@@ -15,15 +15,15 @@ describe("Container", () => {
     }
 
     // Binding implementations
-    const adder = declareInjectable((inject): Adder => {
+    const adder = (inject: Inject): Adder => {
       const numberCarrier = inject<NumberCarrier>(NUMBER_CARRIER);
       const add = (number: number) => number + numberCarrier.num2;
       return { add };
-    });
+    };
 
-    const numberCarrier = declareInjectable((): NumberCarrier => {
+    const numberCarrier = (): NumberCarrier => {
       return { num2: 5 };
-    });
+    };
 
     // Binding bindings
     const container = new Container();
@@ -61,19 +61,19 @@ describe("Container", () => {
     }
 
     // Binding implementations
-    const adder = declareInjectable((inject): Adder => {
+    const adder = (inject: Inject): Adder => {
       const numberCarrier = inject<NumberCarrier>(NUMBER_CARRIER);
       const add = (number: number) => number + numberCarrier.getNum2();
       return { add, baseValue: 3 };
-    });
+    };
 
-    const numberCarrier = declareInjectable((inject): NumberCarrier => {
+    const numberCarrier = (inject: Inject): NumberCarrier => {
       const getNum2 = () => {
         const adder = inject<Adder>(ADDER);
         return adder.baseValue + 1;
       };
       return { getNum2 };
-    });
+    };
 
     // Binding bindings
     const container = new Container();
@@ -110,17 +110,12 @@ describe("Container", () => {
     }
 
     // Binding implementations
-    const messages = declareInjectable(
-      (): Messages => ({
-        welcome: "Hello",
-      })
-    );
-
-    const numbers = declareInjectable(
-      (): Numbers => ({
-        PI: 3.14,
-      })
-    );
+    const messages = (): Messages => ({
+      welcome: "Hello",
+    });
+    const numbers = (): Numbers => ({
+      PI: 3.14,
+    });
 
     // Root container binding bindings
     const container = new Container();
@@ -177,17 +172,12 @@ describe("Container", () => {
     }
 
     // Binding implementations
-    const messages = declareInjectable(
-      (): Messages => ({
-        welcome: "Hello",
-      })
-    );
-
-    const numbers = declareInjectable(
-      (): Numbers => ({
-        PI: 3.14,
-      })
-    );
+    const messages = (): Messages => ({
+      welcome: "Hello",
+    });
+    const numbers = (): Numbers => ({
+      PI: 3.14,
+    });
 
     // Container binding bindings
     const container1 = new Container();

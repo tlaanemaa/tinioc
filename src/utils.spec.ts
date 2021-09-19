@@ -1,12 +1,4 @@
-import { declareInjectable, BindingNotFoundError } from "./utils";
-
-describe("declareInjectable", () => {
-  const arg = () => ({ a: 1 });
-
-  it("should pass it's argument through", () => {
-    expect(declareInjectable(arg)).toBe(arg);
-  });
-});
+import { BindingNotFoundError } from "./utils";
 
 describe("BindingNotFoundError", () => {
   describe("when called with a string", () => {

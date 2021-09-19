@@ -1,2 +1,2 @@
-export { Container } from "./container";
-export { declareInjectable, BindingNotFoundError } from "./utils";
+export { Container, Inject } from "./container";
+export { BindingNotFoundError } from "./utils";

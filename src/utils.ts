@@ -1,14 +1,3 @@
-import { FactoryOf } from "./types";
-
-/**
- * Declare an injectable component.
- *
- * This function is mostly useful for the types it provides. It doesn't do anything
- * with the argument provided to it and just passes it through.
- */
-export const declareInjectable = <T>(binding: FactoryOf<T>): FactoryOf<T> =>
-  binding;
-
 /**
  * Error class for binding-not-found errors.
  *

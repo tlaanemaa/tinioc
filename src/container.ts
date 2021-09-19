@@ -1,9 +1,27 @@
-import { ID, FactoryOf } from "./types";
 import { BindingNotFoundError } from "./utils";
+
+/**
+ * Dependency ID type.
+ * This is what will be used to register them.
+ */
+type ID = string | symbol;
+
+/**
+ * Inject function type that allows bringing in additional dependencies
+ */
+export type Inject = <T>(id: ID) => T;
+
+/**
+ * Utility type to derive the dependency factory type from dependency type
+ */
+type FactoryOf<T> = (inject: Inject) => T;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyFactory = FactoryOf<any>;
 
+/**
+ * Dependency injection container
+ */
 export class Container {
   /**
    * Parent container.
