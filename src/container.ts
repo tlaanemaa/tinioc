@@ -2,7 +2,7 @@ import { ID, FactoryOf } from "./types";
 import { BindingNotFoundError } from "./utils";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyBindingDeclaration = FactoryOf<any>;
+type AnyFactory = FactoryOf<any>;
 
 export class Container {
   /**
@@ -12,7 +12,7 @@ export class Container {
    */
   public parent?: Container;
 
-  private readonly bindings: Record<ID, AnyBindingDeclaration> = {};
+  private readonly bindings: Record<ID, AnyFactory> = {};
 
   /**
    * Returns all binding IDs currently kept in this container
@@ -35,7 +35,7 @@ export class Container {
   /**
    * Get a binding from local or parent's bindings
    */
-  private _get(id: ID): AnyBindingDeclaration | undefined {
+  private _get(id: ID): AnyFactory | undefined {
     return this.bindings[id] ?? this.parent?._get(id);
   }
 
@@ -46,7 +46,7 @@ export class Container {
     const binding = this._get(id);
     if (typeof binding !== "function") throw new BindingNotFoundError(id);
 
-    return binding({ inject: this.get.bind(this) });
+    return binding(this.get.bind(this));
   }
 
   /**

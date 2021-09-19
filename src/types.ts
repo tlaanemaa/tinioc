@@ -5,13 +5,11 @@
 export type ID = string | symbol;
 
 /**
- * This is the context that gets passed into each dependency on initialization
+ * Inject function to allow bringing in additional dependencies
  */
-export type Context = {
-  readonly inject: <T>(id: ID) => T;
-};
+export type Inject = <T>(id: ID) => T;
 
 /**
  * Utility type to derive the dependency factory type from dependency type
  */
-export type FactoryOf<T> = (context: Context) => T;
+export type FactoryOf<T> = (inject: Inject) => T;
