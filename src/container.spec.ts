@@ -31,20 +31,15 @@ describe("Container instance", () => {
       container.bind<Adder>(ADDER, adder);
       container.bind<NumberCarrier>(NUMBER_CARRIER, numberCarrier);
 
-      describe("when asked for a known binding", () => {
+      it("should find a known component", () => {
         const binding = container.get<Adder>(ADDER);
-
-        it("should return that binding and resolve it's bindings", () => {
-          expect(binding.add(7)).toBe(5 + 7);
-        });
+        expect(binding.add(7)).toBe(5 + 7);
       });
 
-      describe("when asked for an unknown binding", () => {
-        it("should throw an error", () => {
-          expect(() => container.get<Adder>("banana")).toThrowError(
-            BindingNotFoundError
-          );
-        });
+      it("should throw and error when asked for an unknown component", () => {
+        expect(() => container.get<Adder>("banana")).toThrowError(
+          BindingNotFoundError
+        );
       });
     });
 
@@ -81,20 +76,15 @@ describe("Container instance", () => {
       container.bind<Adder>(ADDER, adder);
       container.bind<NumberCarrier>(NUMBER_CARRIER, numberCarrier);
 
-      describe("when asked for a known binding", () => {
+      it("should find a known component", () => {
         const binding = container.get<Adder>(ADDER);
-
-        it("should return that binding and resolve it's bindings", () => {
-          expect(binding.add(7)).toBe(3 + 1 + 7);
-        });
+        expect(binding.add(7)).toBe(3 + 1 + 7);
       });
 
-      describe("when asked for an unknown binding", () => {
-        it("should throw an error", () => {
-          expect(() => container.get(Symbol.for("potato"))).toThrowError(
-            BindingNotFoundError
-          );
-        });
+      it("should throw and error when asked for an unknown component", () => {
+        expect(() => container.get<Adder>("banana")).toThrowError(
+          BindingNotFoundError
+        );
       });
     });
   });
@@ -198,27 +188,21 @@ describe("Container instance", () => {
       expect(childContainer).toBeInstanceOf(Container);
     });
 
-    childContainer.bind<Numbers>(NUMBERS, numbers);
-    const grandChildContainer = childContainer.createChild();
+    describe("grandchild container", () => {
+      childContainer.bind<Numbers>(NUMBERS, numbers);
+      const grandChildContainer = childContainer.createChild();
 
-    describe("when asked for a binding in a child container, from a grandchild container", () => {
-      const binding = grandChildContainer.get<Numbers>(NUMBERS);
-
-      it("should return it", () => {
-        expect(binding.PI).toBe(3.14);
-      });
-    });
-
-    describe("when asked for a binding in a root container, from a grandchild container", () => {
-      const binding = grandChildContainer.get<Messages>(MESSAGES);
-
-      it("should return it", () => {
+      it("should find components from the original parent container", () => {
+        const binding = grandChildContainer.get<Messages>(MESSAGES);
         expect(binding.welcome).toBe("Hello");
       });
-    });
 
-    describe("when asked for an unknown binding, from a grandchild container", () => {
-      it("should throw an error", () => {
+      it("should find components from the child container", () => {
+        const binding = grandChildContainer.get<Numbers>(NUMBERS);
+        expect(binding.PI).toBe(3.14);
+      });
+
+      it("should throw if the component is not found in any of the containers", () => {
         expect(() => grandChildContainer.get("potato")).toThrowError(
           BindingNotFoundError
         );
@@ -255,22 +239,20 @@ describe("Container instance", () => {
 
     const mergedContainer = Container.merge(container1, container2);
 
-    describe("when asked for binding from container 1", () => {
-      const binding = mergedContainer.get<Messages>(MESSAGES);
-
-      it("should return it", () => {
-        expect(binding.welcome).toBe("Hello");
-      });
+    it("should return a new container", () => {
+      expect(mergedContainer).toBeInstanceOf(Container);
     });
 
-    describe("when asked for binding from container 2", () => {
-      const binding = mergedContainer.get<Numbers>(NUMBERS);
+    describe("merged container", () => {
+      it("should find components from container 1", () => {
+        const binding = mergedContainer.get<Messages>(MESSAGES);
+        expect(binding.welcome).toBe("Hello");
+      });
 
-      it("should return it", () => {
+      it("should find components from container 2", () => {
+        const binding = mergedContainer.get<Numbers>(NUMBERS);
         expect(binding.PI).toBe(3.14);
       });
     });
   });
-
-  // describe('when ')
 });
