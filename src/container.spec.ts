@@ -99,7 +99,75 @@ describe("Container instance", () => {
     });
   });
 
-  describe("extend", () => {});
+  describe("extend", () => {
+    // Binding declarations
+    const MESSAGES = Symbol.for("messages");
+    interface Messages {
+      welcome: string;
+    }
+
+    const NUMBERS = Symbol.for("numbers");
+    interface Numbers {
+      PI: number;
+    }
+
+    const BREADS = Symbol.for("breads");
+    interface Breads {
+      baguette: number;
+    }
+
+    // Binding implementations
+    const messages = (): Messages => ({
+      welcome: "Hello",
+    });
+    const numbers = (): Numbers => ({
+      PI: 3.14,
+    });
+    const breads = (): Breads => ({
+      baguette: 5,
+    });
+
+    // Container bindings
+    const baseContainer1 = new Container();
+    baseContainer1.bind<Messages>(MESSAGES, messages);
+    const baseContainer2 = new Container();
+    baseContainer2.bind<Numbers>(NUMBERS, numbers);
+
+    describe("when extended with the first base container", () => {
+      const container = new Container();
+      container.extend(baseContainer1);
+      container.bind<Breads>(BREADS, breads);
+
+      it("should find own components", () => {
+        const component = container.get<Breads>(BREADS);
+        expect(component.baguette).toBe(5);
+      });
+
+      it("should find the components from the first base container", () => {
+        const component = container.get<Messages>(MESSAGES);
+        expect(component.welcome).toBe("Hello");
+      });
+
+      describe("when extended with the second base container", () => {
+        container.extend(baseContainer2);
+
+        it("should find the components from the second base container", () => {
+          const component = container.get<Numbers>(NUMBERS);
+          expect(component.PI).toBe(3.14);
+        });
+
+        it("should still find the components from the first base container", () => {
+          const component = container.get<Messages>(MESSAGES);
+          expect(component.welcome).toBe("Hello");
+        });
+
+        it("should still find own components", () => {
+          const component = container.get<Breads>(BREADS);
+          expect(component.baguette).toBe(5);
+        });
+      });
+    });
+  });
 
   describe("createChild", () => {
     // Binding declarations
@@ -133,7 +201,7 @@ describe("Container instance", () => {
     childContainer.bind<Numbers>(NUMBERS, numbers);
     const grandChildContainer = childContainer.createChild();
 
-    describe("when asked for a binding in the child container, from the grandchild container", () => {
+    describe("when asked for a binding in a child container, from a grandchild container", () => {
       const binding = grandChildContainer.get<Numbers>(NUMBERS);
 
       it("should return it", () => {
@@ -141,7 +209,7 @@ describe("Container instance", () => {
       });
     });
 
-    describe("when asked for a binding in the root container, from the grandchild container", () => {
+    describe("when asked for a binding in a root container, from a grandchild container", () => {
       const binding = grandChildContainer.get<Messages>(MESSAGES);
 
       it("should return it", () => {
@@ -149,7 +217,7 @@ describe("Container instance", () => {
       });
     });
 
-    describe("when asked for an unknown binding, from the grandchild container", () => {
+    describe("when asked for an unknown binding, from a grandchild container", () => {
       it("should throw an error", () => {
         expect(() => grandChildContainer.get("potato")).toThrowError(
           BindingNotFoundError

@@ -24,12 +24,15 @@ type AnyFactory = FactoryOf<any>;
  */
 export class Container {
   /**
-   * Parent container.
+   * Parent containers.
    *
-   * Any binding that is not found in this container will be looked for in the parent, if it exists.
+   * Any binding that is not found in this container will be looked for in the parents, if they exists.
    */
-  public parent?: Container;
+  public parents: Container[] = [];
 
+  /**
+   * Bindings map
+   */
   private readonly bindings: Record<ID, AnyFactory> = {};
 
   /**
@@ -51,10 +54,13 @@ export class Container {
   }
 
   /**
-   * Get a binding from local or parent's bindings
+   * Get a binding from local or parents' bindings
    */
   private _get(id: ID): AnyFactory | undefined {
-    return this.bindings[id] ?? this.parent?._get(id);
+    if (this.bindings[id]) return this.bindings[id];
+
+    const parentWithBinding = this.parents.find((parent) => parent._get(id));
+    return parentWithBinding?._get(id);
   }
 
   /**
@@ -68,11 +74,32 @@ export class Container {
   }
 
   /**
+   * Extends the container's array of parents with the given containers.
+   * This makes the given containers' contents available to this container,
+   * effectively creating a dependency relationship.
+   *
+   * For example, if some components in your container depend on some components
+   * in another container then you should extend your container with that other container
+   * to make those dependencies available for your components.
+   *
+   * This will append to the list of parents, if a new unique container is provided, and not overwrite it.
+   */
+  public extend(...containers: Container[]): this {
+    containers.forEach((container) => {
+      if (!this.parents.includes(container)) {
+        this.parents.push(container);
+      }
+    });
+
+    return this;
+  }
+
+  /**
    * Creates and returns a child container
    */
   public createChild(): Container {
     const childContainer = new Container();
-    childContainer.parent = this;
+    childContainer.parents.push(this);
     return childContainer;
   }
 
