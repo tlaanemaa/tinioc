@@ -3,8 +3,8 @@ import { BindingNotFoundError } from "./utils";
 
 describe("Container instance", () => {
   describe("get", () => {
-    describe("when used with simple binding relationships", () => {
-      // Binding declarations
+    describe("when used with simple component relationships", () => {
+      // Component declarations
       const ADDER = Symbol.for("adder");
       interface Adder {
         add(number: number): number;
@@ -15,7 +15,7 @@ describe("Container instance", () => {
         num2: number;
       }
 
-      // Binding implementations
+      // Component implementations
       const adder = (inject: Inject): Adder => {
         const numberCarrier = inject<NumberCarrier>(NUMBER_CARRIER);
         const add = (number: number) => number + numberCarrier.num2;
@@ -26,14 +26,14 @@ describe("Container instance", () => {
         return { num2: 5 };
       };
 
-      // Binding bindings
+      // Component bindings
       const container = new Container();
       container.bind<Adder>(ADDER, adder);
       container.bind<NumberCarrier>(NUMBER_CARRIER, numberCarrier);
 
       it("should find a known component", () => {
-        const binding = container.get<Adder>(ADDER);
-        expect(binding.add(7)).toBe(5 + 7);
+        const component = container.get<Adder>(ADDER);
+        expect(component.add(7)).toBe(5 + 7);
       });
 
       it("should throw and error when asked for an unknown component", () => {
@@ -43,8 +43,8 @@ describe("Container instance", () => {
       });
     });
 
-    describe("when used with circular binding relationships", () => {
-      // Binding declarations
+    describe("when used with circular component relationships", () => {
+      // Component declarations
       const ADDER = Symbol.for("adder");
       interface Adder {
         baseValue: number;
@@ -56,7 +56,7 @@ describe("Container instance", () => {
         getNum2(): number;
       }
 
-      // Binding implementations
+      // Component implementations
       const adder = (inject: Inject): Adder => {
         const numberCarrier = inject<NumberCarrier>(NUMBER_CARRIER);
         const add = (number: number) => number + numberCarrier.getNum2();
@@ -71,14 +71,14 @@ describe("Container instance", () => {
         return { getNum2 };
       };
 
-      // Binding bindings
+      // Component bindings
       const container = new Container();
       container.bind<Adder>(ADDER, adder);
       container.bind<NumberCarrier>(NUMBER_CARRIER, numberCarrier);
 
       it("should find a known component", () => {
-        const binding = container.get<Adder>(ADDER);
-        expect(binding.add(7)).toBe(3 + 1 + 7);
+        const component = container.get<Adder>(ADDER);
+        expect(component.add(7)).toBe(3 + 1 + 7);
       });
 
       it("should throw and error when asked for an unknown component", () => {
@@ -90,7 +90,7 @@ describe("Container instance", () => {
   });
 
   describe("extend", () => {
-    // Binding declarations
+    // Component declarations
     const MESSAGES = Symbol.for("messages");
     interface Messages {
       welcome: string;
@@ -106,7 +106,7 @@ describe("Container instance", () => {
       baguette: number;
     }
 
-    // Binding implementations
+    // Component implementations
     const messages = (): Messages => ({
       welcome: "Hello",
     });
@@ -179,7 +179,7 @@ describe("Container instance", () => {
       PI: 3.14,
     });
 
-    // Root container binding bindings
+    // Root container component bindings
     const container = new Container();
     container.bind<Messages>(MESSAGES, messages);
     const childContainer = container.createChild();
@@ -193,13 +193,13 @@ describe("Container instance", () => {
       const grandChildContainer = childContainer.createChild();
 
       it("should find components from the original parent container", () => {
-        const binding = grandChildContainer.get<Messages>(MESSAGES);
-        expect(binding.welcome).toBe("Hello");
+        const component = grandChildContainer.get<Messages>(MESSAGES);
+        expect(component.welcome).toBe("Hello");
       });
 
       it("should find components from the child container", () => {
-        const binding = grandChildContainer.get<Numbers>(NUMBERS);
-        expect(binding.PI).toBe(3.14);
+        const component = grandChildContainer.get<Numbers>(NUMBERS);
+        expect(component.PI).toBe(3.14);
       });
 
       it("should throw if the component is not found in any of the containers", () => {
@@ -211,7 +211,7 @@ describe("Container instance", () => {
   });
 
   describe("Container.merge", () => {
-    // Binding declarations
+    // Component declarations
     const MESSAGES = Symbol.for("messages");
     interface Messages {
       welcome: string;
@@ -222,7 +222,7 @@ describe("Container instance", () => {
       PI: number;
     }
 
-    // Binding implementations
+    // Component implementations
     const messages = (): Messages => ({
       welcome: "Hello",
     });
@@ -230,7 +230,7 @@ describe("Container instance", () => {
       PI: 3.14,
     });
 
-    // Container binding bindings
+    // Component bindings
     const container1 = new Container();
     container1.bind<Messages>(MESSAGES, messages);
 
@@ -244,14 +244,14 @@ describe("Container instance", () => {
     });
 
     describe("merged container", () => {
-      it("should find components from container 1", () => {
-        const binding = mergedContainer.get<Messages>(MESSAGES);
-        expect(binding.welcome).toBe("Hello");
+      it("should find components from the first container", () => {
+        const component = mergedContainer.get<Messages>(MESSAGES);
+        expect(component.welcome).toBe("Hello");
       });
 
-      it("should find components from container 2", () => {
-        const binding = mergedContainer.get<Numbers>(NUMBERS);
-        expect(binding.PI).toBe(3.14);
+      it("should find components from the second container", () => {
+        const component = mergedContainer.get<Numbers>(NUMBERS);
+        expect(component.PI).toBe(3.14);
       });
     });
   });
