@@ -123,10 +123,19 @@ describe("Container instance", () => {
     const baseContainer2 = new Container();
     baseContainer2.bind<Numbers>(NUMBERS, numbers);
 
-    describe("when extended with the first base container", () => {
+    describe("when extended with 2 containers, separately", () => {
       const container = new Container();
       container.extend(baseContainer1);
+      container.extend(baseContainer2);
+      container.extend(baseContainer1); // This is used to test the uniqueness
       container.bind<Breads>(BREADS, breads);
+
+      it("should push provided unique containers to the parents array", () => {
+        expect(container.parents).toStrictEqual([
+          baseContainer1,
+          baseContainer2,
+        ]);
+      });
 
       it("should find own components", () => {
         const component = container.get<Breads>(BREADS);
@@ -138,23 +147,9 @@ describe("Container instance", () => {
         expect(component.welcome).toBe("Hello");
       });
 
-      describe("when extended with the second base container", () => {
-        container.extend(baseContainer2);
-
-        it("should find the components from the second base container", () => {
-          const component = container.get<Numbers>(NUMBERS);
-          expect(component.PI).toBe(3.14);
-        });
-
-        it("should still find the components from the first base container", () => {
-          const component = container.get<Messages>(MESSAGES);
-          expect(component.welcome).toBe("Hello");
-        });
-
-        it("should still find own components", () => {
-          const component = container.get<Breads>(BREADS);
-          expect(component.baguette).toBe(5);
-        });
+      it("should find the components from the second base container", () => {
+        const component = container.get<Numbers>(NUMBERS);
+        expect(component.PI).toBe(3.14);
       });
     });
   });
