@@ -36,16 +36,6 @@ export class Container {
   private readonly bindings: Record<ID, AnyFactory> = {};
 
   /**
-   * Returns all binding IDs currently kept in this container
-   */
-  private getBindingIds() {
-    return [
-      ...Object.getOwnPropertySymbols(this.bindings),
-      ...Object.getOwnPropertyNames(this.bindings),
-    ];
-  }
-
-  /**
    * Register a new binding
    */
   public bind<T>(id: ID, value: FactoryOf<T>): this {
@@ -101,25 +91,5 @@ export class Container {
     const childContainer = new Container();
     childContainer.extend(this);
     return childContainer;
-  }
-
-  /**
-   * Merge given containers together into a new container.
-   * The new container will have no relation to the provided containers,
-   * its a fresh copy with all the bindings rebound to it.
-   *
-   * **PS!** Only bindings from the containers themselves will be copied.
-   * The parents of the containers will not be looked at.
-   */
-  static merge(...containers: Container[]): Container {
-    const mergedContainer = new Container();
-
-    containers.forEach((container) => {
-      container.getBindingIds().forEach((id) => {
-        mergedContainer.bind(id, container.bindings[id]);
-      });
-    });
-
-    return mergedContainer;
   }
 }
