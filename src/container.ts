@@ -33,13 +33,13 @@ export class Container {
   /**
    * Bindings map
    */
-  private readonly bindings: Record<ID, AnyFactory> = {};
+  private readonly bindings = new Map<ID, AnyFactory>();
 
   /**
    * Register a new binding
    */
   public bind<T>(id: ID, value: FactoryOf<T>): this {
-    this.bindings[id] = value;
+    this.bindings.set(id, value);
     return this;
   }
 
@@ -47,10 +47,12 @@ export class Container {
    * Get a binding from local or parents' bindings
    */
   private _get(id: ID): AnyFactory | undefined {
-    if (this.bindings[id]) return this.bindings[id];
+    if (this.bindings.has(id)) return this.bindings.get(id);
 
-    const parentWithBinding = this.parents.find((parent) => parent._get(id));
-    return parentWithBinding?._get(id);
+    for (let i = 0; i < this.parents.length; i += 1) {
+      const binding = this.parents[i]._get(id);
+      if (binding !== undefined) return binding;
+    }
   }
 
   /**
@@ -58,7 +60,7 @@ export class Container {
    */
   public get<T>(id: ID): T {
     const binding = this._get(id);
-    if (typeof binding !== "function") throw new BindingNotFoundError(id);
+    if (binding === undefined) throw new BindingNotFoundError(id);
 
     return binding(this.get.bind(this));
   }

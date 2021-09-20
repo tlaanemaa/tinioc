@@ -10,7 +10,7 @@ describe("Container instance", () => {
         add(number: number): number;
       }
 
-      const NUMBER_CARRIER = Symbol.for("number_carrier");
+      const NUMBER_CARRIER = "number_carrier";
       interface NumberCarrier {
         num2: number;
       }
