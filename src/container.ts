@@ -99,7 +99,7 @@ export class Container {
    */
   public createChild(): Container {
     const childContainer = new Container();
-    childContainer.parents.push(this);
+    childContainer.extend(this);
     return childContainer;
   }
 
