@@ -82,7 +82,7 @@ Getting access to components is very straightforward, here's an example of an ex
 // controller.ts
 
 import { RequestHandler } from "express";
-import { IMyComponent, MY_COMPONENT } from "../bindings";
+import { IMyComponent, MY_COMPONENT } from "./bindings";
 import { container } from "./container";
 
 export const controller: RequestHandler = (req, res, next) => {
@@ -101,7 +101,7 @@ Now, let's say you want to put some request context into the container before yo
 // controller.ts
 
 import { RequestHandler } from "express";
-import { IMyComponent, MY_COMPONENT } from "../bindings";
+import { IMyComponent, MY_COMPONENT } from "./bindings";
 import { container } from "./container";
 
 export const controller: RequestHandler = (req, res, next) => {
