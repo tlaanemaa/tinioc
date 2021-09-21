@@ -1,2 +1,2 @@
-export { Container, Inject } from "./container";
+export { ID, Inject, Container } from "./container";
 export { BindingNotFoundError } from "./utils";

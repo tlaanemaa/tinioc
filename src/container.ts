@@ -1,6 +1,9 @@
 import { BindingNotFoundError } from "./utils";
 
-type ID = string | symbol;
+/**
+ * ID type used for binding and injecting components.
+ */
+export type ID = string | symbol;
 
 /**
  * Type of the injector function passed to component factories as the first argument
