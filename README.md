@@ -6,9 +6,11 @@ _A tiny inversion of control container for all coding styles_
 
 ## Overview
 
-The core idea behind tinioc is to enable the benefits of inversion of control (IoC) with minimum limitations and magic. Inversion of control, making implementations depend on interfaces and not the other way around, has huge decoupling benefits. It allows you to write code in a manner that leaves your components decoupled from each other thus making it easier to change their implementation or replace them completely. This has, however, often come with the overhead of added magic, libraries enabling IoC, perform complex dependency graph resolutions under the hood to know what to inject where. These libraries are often also quite thick and come with restrictions on your implementation, for example, you have to use classes to get the most use out of them.  
-This is what tinioc attempts to solve. It brings most of the benefits of IoC without the magic or constraints. The whole container implementation is in a single file, about 100 files long with comments, you can easily look through it and understand every step that's taken if you wish. It also doesn't constrain you to classes, you're free to use whatever you want. This is achieved by the simple concept of an injector function, instead of making the library resolve the dependency graph, it just gives you the injector function so you can inject whatever you need, wherever you need it.  
-Here's an example of how the injector function is used to inject a dependency into another:
+The core idea here is to give you the main benefits of inversion of control, decoupling, and ease of testing, with minimal magic and constraints on your coding style. Inversion of control (IoC) brings massive benefits but applying it often means using a library that does things under the hood which might not be obvious, some magic is happening. This tends to drive people away because, as engineers, we like to know how our stuff works. That is compounded by the fact that IoC libraries often constraint you to some specific coding style, most often object-oriented design with classes.
+
+Tinioc attempts to solve that. The library's dead simple, the whole container implementation is around 100 lines of simple code so you can easily go through it in one sitting. It also sets minimal constraints on your coding style, you can use functions or classes or whatever you like to use. The only constraint placed is that your components should be registered as factory functions, within that constraint you're free to do whatever you want. This simplicity and freedom are enabled by the simple concept of an injector function. Tinioc doesn't build dependency graphs, it doesn't even deal with dependency scopes, all it does is give you an injector function to inject your dependencies where you need them. This way you're free to use it however you want.
+
+Here's an example of how the injector function is used to inject a dependency into a component:
 
 ```ts
 // myComponent.ts
@@ -25,12 +27,14 @@ export const myComponent = (inject: Inject): IMyComponent => ({
 ```
 
 As you can see, injecting a dependency is as easy as calling a function, and it's also type-safe if you're using typescript!
-You may notice that we use an Id and a type separately to inject the logger here, this is what enables us to get the IoC benefits. As you see, we're not mentioning the concrete logger implementation anywhere, this means we can change the implementation and as long as it fits within the same interface, we don't have to worry about anything! We can even replace it with a new logger completely, just as long as it fits within the interface. Our dependant components are happy because they get a dependency whose interface they can trust and our dependency is happy because it's free to change within that interface. Decoupling!
+You may notice that we use an id and a type separately to inject the logger here, this is how we get the IoC benefits. The concrete logger implementation isn't mentioned anywhere so we can change the implementation and as long as it fits within the same interface, we're good! Our dependant components are happy because they get a dependency whose interface they can trust and our dependency is happy because it's free to change within that interface. Decoupling!
+
+There are also testing benefits here, we can easily pass in a mocked inject function that returns mocked dependencies.
 
 ### Dependency injections
 
 As mentioned above, dependency injections are done with the `inject` function, provided to your component's factory as the first argument. This function can also be passed on if you find a need for that, for example into a class constructor, up to you!  
-The function doesn't guarantee any type information on its own. This seems like a downside at first but is what actually enables us to perform IoC well. You see, we don't want to actually touch the implementation in the injection process, we just want the ID so that we can keep them decoupled. The type <-> id pair will be kept in a bindings file, close to each other, so it's easy to find and use.
+The function doesn't guarantee any type information on its own. This seems like a downside at first but is what enables us to perform IoC well. You see, we don't want to touch the implementation in the injection process, we just want the ID so that we can keep them decoupled. The type <-> id pair will be kept in a bindings file, close to each other, so it's easy to find and use.
 
 ### Bindings
 
@@ -55,7 +59,7 @@ This is what we'll be using to inject our dependency and this is also what we'll
 
 ### Container
 
-To facilitate the injection, we need a dependency injection container. This is also where our interfaces, ids, and implementations will be connected to each other. Here's an example of a container:
+To facilitate the injection, we need a dependency injection container. This is also where our interfaces, ids, and implementations will be connected. Here's an example of a container:
 
 ```ts
 // container.ts
@@ -94,7 +98,7 @@ export const controller: RequestHandler = (req, res, next) => {
 };
 ```
 
-Notice how we use the `get` method in exactly the same way as we used `inject` before, that's because they're the exact same method!  
+Notice how we use the `get` method in the same way as we used `inject` before, that's because they're the same method!  
 Now, let's say you want to put some request context into the container before you get your component. This can be easily achieved with `container.createChild` like so:
 
 ```ts
