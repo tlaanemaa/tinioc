@@ -21,7 +21,7 @@ export class Container {
    *
    * These allow setting up parent-child relationships between containers, thus enabling
    * hierarchical dependency injection systems. Multiple parents are supported so you can essentially
-   * make your container "inherit" from a number of other containers
+   * make your container "inherit" from several other containers
    */
   public parents: Container[] = [];
   private readonly bindings = new Map<ID, AnyFactory>();
@@ -90,7 +90,7 @@ export class Container {
    * to make those dependencies available for your components.
    *
    * This will append to the list of parents and not overwrite it.
-   * A new parent is only added if it doesnt already exist in the `parents` array.
+   * A new parent is only added if it doesn't already exist in the `parents` array.
    *
    * Example:
    * ```ts
@@ -110,8 +110,8 @@ export class Container {
   /**
    * Creates and returns a child container.
    *
-   * This is effectively the reverse of extend.
-   * The new container will have this container as it's only parent.
+   * This is effectively the reverse of extending.
+   * The new container will have this container as the only parent.
    *
    * Child containers are very useful when you want to bind something for a single run,
    * for example if you've got request context you want to bind to the container before getting your service.
