@@ -21,7 +21,8 @@ import { INumbersDB, NUMBERS_DB } from "../bindings";
 export const myComponent = (inject: Inject): IMyComponent => ({
   getMyFavoriteNumber: async () => {
     const numbersDB = inject<INumbersDB>(NUMBERS_DB);
-    return numbersDB.getById("favorite_number") ?? 7;
+    const favoriteNumber = await numbersDB.getById("favorite_number");
+    return favoriteNumber ?? 7;
   },
 });
 ```
@@ -89,8 +90,8 @@ import { RequestHandler } from "express";
 import { IMyComponent, MY_COMPONENT } from "./bindings";
 import { container } from "./container";
 
-export const controller: RequestHandler = (req, res, next) => {
-  const myFavoriteNumber = container
+export const controller: RequestHandler = async (req, res, next) => {
+  const myFavoriteNumber = await container
     .get<IMyComponent>(MY_COMPONENT)
     .getMyFavoriteNumber();
 
@@ -108,9 +109,9 @@ import { RequestHandler } from "express";
 import { IMyComponent, MY_COMPONENT } from "./bindings";
 import { container } from "./container";
 
-export const controller: RequestHandler = (req, res, next) => {
+export const controller: RequestHandler = async (req, res, next) => {
   const ctx = { correlationId: req.header("correlation-id") };
-  const myFavoriteNumber = container
+  const myFavoriteNumber = await container
     .createChild()
     .bind<IRequestContext>(REQUEST_CONTEXT, () => ctx)
     .get<IMyComponent>(MY_COMPONENT)
