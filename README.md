@@ -2,18 +2,18 @@
 
 [![Node.js CI](https://github.com/tlaanemaa/tinioc/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/tlaanemaa/tinioc/actions/workflows/node.js.yml)
 
-_A tiny inversion of control container for all coding styles_
+_A tiny dependency injection container for all coding styles_
 
 ## Overview
 
-Tinioc gives you the main benefits of inversion of control in a simple, minimal package.
+Tinioc gives you the main benefits of dependency injection in a simple, minimal package.
 
 - Decoupling
 - Ease of testing
 - Almost no constraints on your coding style
-- A simple IoC container that's easy to understand
+- A simple dependency injection container that's easy to understand
 
-Inversion of control (IoC) brings massive benefits but applying it often means using a library that does things under the hood which might not be obvious, some magic is happening. This tends to drive people away because, as engineers, we like to know how our stuff works. That is compounded by the fact that IoC libraries often constraint you to some specific coding style, most often object-oriented design with classes.
+Dependency injection brings massive benefits but applying it often means using a library that does things under the hood which might not be obvious, some magic is happening. This tends to drive people away because, as engineers, we like to know how our stuff works. That is compounded by the fact that dependency injection libraries often constraint you to some specific coding style, most often object-oriented design with classes.
 
 Tinioc solves that. The library's dead simple, the whole container implementation is around 100 lines of simple code so you can easily go through it in one sitting. It also sets almost no constraints on your coding style, you can use functions or classes or whatever you like to use. The only constraint placed is that your components should be registered as factory functions, within that constraint you're free to do whatever you want. This simplicity and freedom are enabled by the simple concept of an injector function. Tinioc doesn't build dependency graphs, it doesn't even deal with dependency scopes, all it does is give you an injector function to inject your dependencies where you need them. This way you're free to use it however you want.
 
