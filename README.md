@@ -151,8 +151,53 @@ const component = inject<IMyComponent>(MY_COMPONENT);
 ```
 
 It is suggested you keep your dependency ids and types close to each other,
-preferably in a separate `bindings` file. This makes them easy to use and improves
+preferably in a separate `bindings` file. That makes them easy to use and improves
 maintainability.
+
+### container.isBound()
+
+```ts
+isBound(id: ID): boolean;
+```
+
+Check if there is a binding for a given id.
+This will check this container and also all of it's parents.
+
+Example:
+
+```ts
+const myComponentIsBound = container.isBound(MY_COMPONENT);
+```
+
+### container.isCurrentBound()
+
+```ts
+isCurrentBound(id: ID): boolean;
+```
+
+Check if there is a binding for a given id.
+This will check only this container.
+
+Example:
+
+```ts
+const myComponentIsBound = container.isCurrentBound(MY_COMPONENT);
+```
+
+### container.unbind()
+
+```ts
+isCurrentBound(id: ID): boolean;
+```
+
+Removes the binding for the given id.
+This will only remove it in this container.
+
+Example:
+
+```ts
+container.unbind(MY_COMPONENT);
+```
 
 ### container.get()
 
@@ -228,7 +273,7 @@ parents: Container[];
 Array of parent containers
 
 These allow setting up parent-child relationships between containers, thus enabling
-hierarchical dependency injection systems. Multiple parents are supported so you can essentially
+hierarchical dependency injection systems. Multiple parents are supported, so you can essentially
 make your container "inherit" from several other containers
 
 ### All type declarations

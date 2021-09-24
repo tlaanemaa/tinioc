@@ -2,6 +2,123 @@ import { Container, Inject } from "./container";
 import { BindingNotFoundError } from "./utils";
 
 describe("Container instance", () => {
+  describe("bind", () => {
+    // Component declarations
+    const ADDER = Symbol.for("adder");
+    interface Adder {
+      add(number1: number, number2: number): number;
+    }
+
+    // Component implementations
+    const adder = (): Adder => ({
+      add: (number1: number, number2: number) => number1 + number2,
+    });
+
+    const container = new Container();
+
+    it("should bind a component into the container", () => {
+      expect(container.isBound(ADDER)).toBe(false);
+      container.bind<Adder>(ADDER, adder);
+      expect(container.isBound(ADDER)).toBe(true);
+    });
+  });
+
+  describe("isBound", () => {
+    // Component declarations
+    const ADDER = Symbol.for("adder");
+    interface Adder {
+      add(number1: number, number2: number): number;
+    }
+
+    // Component implementations
+    const adder = (): Adder => ({
+      add: (number1: number, number2: number) => number1 + number2,
+    });
+
+    const container = new Container();
+    container.bind<Adder>(ADDER, adder);
+
+    it("return true if component is bound in the container", () => {
+      expect(container.isBound(ADDER)).toBe(true);
+    });
+
+    it("should return true if component is bound in the parent container", () => {
+      const childContainer = container.createChild();
+      expect(childContainer.isBound(ADDER)).toBe(true);
+    });
+  });
+
+  describe("isCurrentBound", () => {
+    // Component declarations
+    const ADDER = Symbol.for("adder");
+    interface Adder {
+      add(number1: number, number2: number): number;
+    }
+
+    // Component implementations
+    const adder = (): Adder => ({
+      add: (number1: number, number2: number) => number1 + number2,
+    });
+
+    const container = new Container();
+    container.bind<Adder>(ADDER, adder);
+
+    it("return true if component is bound in the container", () => {
+      expect(container.isCurrentBound(ADDER)).toBe(true);
+    });
+
+    it("should return false if component is bound in the parent container", () => {
+      const childContainer = container.createChild();
+      expect(childContainer.isCurrentBound(ADDER)).toBe(false);
+    });
+  });
+
+  describe("unbind", () => {
+    // Component declarations
+    const ADDER = Symbol.for("adder");
+    interface Adder {
+      add(number1: number, number2: number): number;
+    }
+
+    // Component implementations
+    const adder = (): Adder => ({
+      add: (number1: number, number2: number) => number1 + number2,
+    });
+
+    it("should unbind the component from the container", () => {
+      const container = new Container();
+      container.bind<Adder>(ADDER, adder);
+
+      expect(container.isBound(ADDER)).toBe(true);
+      container.unbind(ADDER);
+      expect(container.isBound(ADDER)).toBe(false);
+    });
+
+    it("should not unbind the component from a parent container", () => {
+      const container = new Container();
+      container.bind<Adder>(ADDER, adder);
+      const childContainer = container.createChild();
+
+      expect(childContainer.isBound(ADDER)).toBe(true);
+      childContainer.unbind(ADDER);
+      expect(childContainer.isBound(ADDER)).toBe(true);
+      expect(childContainer.isCurrentBound(ADDER)).toBe(false);
+    });
+
+    it("should not unbind other components from the container", () => {
+      const ADDER2 = Symbol.for("adder2");
+      const container = new Container();
+      container.bind<Adder>(ADDER, adder);
+      container.bind<Adder>(ADDER2, adder);
+
+      expect(container.isBound(ADDER)).toBe(true);
+      expect(container.isBound(ADDER2)).toBe(true);
+      container.unbind(ADDER);
+      expect(container.isBound(ADDER)).toBe(false);
+      expect(container.isBound(ADDER2)).toBe(true);
+    });
+  });
+
   describe("get", () => {
     describe("when used with simple component relationships", () => {
       // Component declarations

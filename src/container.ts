@@ -23,7 +23,7 @@ export class Container {
    * Array of parent containers
    *
    * These allow setting up parent-child relationships between containers, thus enabling
-   * hierarchical dependency injection systems. Multiple parents are supported so you can essentially
+   * hierarchical dependency injection systems. Multiple parents are supported, so you can essentially
    * make your container "inherit" from several other containers
    */
   public parents: Container[] = [];
@@ -45,11 +45,54 @@ export class Container {
    * const component = inject<IMyComponent>(MY_COMPONENT);
    * ```
    * It is suggested you keep your dependency ids and types close to each other,
-   * preferably in a separate `bindings` file. This makes them easy to use and improves
+   * preferably in a separate `bindings` file. That makes them easy to use and improves
    * maintainability.
    */
   public bind<T>(id: ID, value: FactoryOf<T>): this {
     this.bindings.set(id, value);
+    return this;
+  }
+
+  /**
+   * Check if there is a binding for a given id.
+   * This will check this container and also all of its parents.
+   *
+   * Example:
+   * ```ts
+   * const myComponentIsBound = container.isBound(MY_COMPONENT)
+   * ```
+   */
+  public isBound(id: ID): boolean {
+    return (
+      this.isCurrentBound(id) ||
+      this.parents.some((parent) => parent.isBound(id))
+    );
+  }
+
+  /**
+   * Check if there is a binding for a given id.
+   * This will check only this container.
+   *
+   * Example:
+   * ```ts
+   * const myComponentIsBound = container.isCurrentBound(MY_COMPONENT)
+   * ```
+   */
+  public isCurrentBound(id: ID): boolean {
+    return this.bindings.has(id);
+  }
+
+  /**
+   * Removes the binding for the given id.
+   * This will only remove it in this container.
+   *
+   * Example:
+   * ```ts
+   * container.unbind(MY_COMPONENT)
+   * ```
+   */
+  public unbind(id: ID): this {
+    this.bindings.delete(id);
     return this;
   }
 
