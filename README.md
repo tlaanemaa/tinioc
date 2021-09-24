@@ -63,7 +63,28 @@ export interface IMyComponent {
 }
 ```
 
-This is what we'll be using to inject our dependency and this is also what we'll be writing our implementation against. Keeping the bindings in a central place like this gives us a simple overview of all the components we've got in our system
+This is what we'll be using to inject our dependency and this is also what we'll be writing our implementation against. Keeping the bindings in a central place like this gives us a simple overview of all the components we've got in our system.
+
+An easier (but not ideal) way to create id <-> type pairs is to keep them right next to your implementation. This seems convenient, its all in one place and you can derive the interface from the implementation, less work. The problem is, it doesn't actually give much decoupling. That's because you're effectively depending on the implementation and not an abstraction, the interface. You also wont get the same typings help, if you introduce a breaking change to your component you wont be notified until you look at the components you broke.  
+Nevertheless, here's an example of that:
+
+```ts
+// myComponent.ts
+
+import { Inject } from "tinioc";
+import { INumbersDB, NUMBERS_DB } from "../bindings";
+
+export const myComponent = (inject: Inject) => ({
+  getMyFavoriteNumber: async () => {
+    const numbersDB = inject<INumbersDB>(NUMBERS_DB);
+    const favoriteNumber = await numbersDB.getById("favorite_number");
+    return favoriteNumber ?? 7;
+  },
+});
+
+export const MY_COMPONENT = Symbol.for("my_component");
+export type IMyComponent = ReturnType<typeof myComponent>;
+```
 
 ### Container
 
