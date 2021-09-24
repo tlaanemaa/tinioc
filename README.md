@@ -129,10 +129,6 @@ If for some reason the component is not found, a `BindingNotFoundError` will be 
 
 ### container.bind()
 
-```ts
-bind<T>(id: ID, value: FactoryOf<T>): this;
-```
-
 Register an id with a component in the container.
 
 You can make use of the generic type on this method to enforce that the
@@ -156,10 +152,6 @@ maintainability.
 
 ### container.isBound()
 
-```ts
-isBound(id: ID): boolean;
-```
-
 Check if there is a binding for a given id.
 This will check this container and also all of it's parents.
 
@@ -170,10 +162,6 @@ const myComponentIsBound = container.isBound(MY_COMPONENT);
 ```
 
 ### container.isCurrentBound()
-
-```ts
-isCurrentBound(id: ID): boolean;
-```
 
 Check if there is a binding for a given id.
 This will check only this container.
@@ -186,10 +174,6 @@ const myComponentIsBound = container.isCurrentBound(MY_COMPONENT);
 
 ### container.unbind()
 
-```ts
-isCurrentBound(id: ID): boolean;
-```
-
 Removes the binding for the given id.
 This will only remove it in this container.
 
@@ -200,10 +184,6 @@ container.unbind(MY_COMPONENT);
 ```
 
 ### container.get()
-
-```ts
-get<T>(id: ID): T;
-```
 
 Get a binding from the container
 
@@ -222,10 +202,6 @@ const component = container.get<IMyComponent>(MY_COMPONENT);
 
 ### container.createChild()
 
-```ts
-createChild(): Container;
-```
-
 Creates and returns a child container.
 
 This is effectively the reverse of extending.
@@ -242,10 +218,6 @@ const child = container.createChild();
 ```
 
 ### container.extend()
-
-```ts
-extend(...containers: Container[]): this;
-```
 
 Extends the container's array of parents with the given containers.
 This makes the given containers' contents available to this container,
@@ -266,10 +238,6 @@ container.extend(otherContainer1, otherContainer2);
 
 ### container.parents
 
-```ts
-parents: Container[];
-```
-
 Array of parent containers
 
 These allow setting up parent-child relationships between containers, thus enabling
@@ -286,6 +254,9 @@ declare type FactoryOf<T> = (inject: Inject) => T;
 declare class Container {
   parents: Container[];
   bind<T>(id: ID, value: FactoryOf<T>): this;
+  isBound(id: ID): boolean;
+  isCurrentBound(id: ID): boolean;
+  unbind(id: ID): this;
   get<T>(id: ID): T;
   extend(...containers: Container[]): this;
   createChild(): Container;
