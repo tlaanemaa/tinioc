@@ -42,7 +42,8 @@ There are also testing benefits here, we can easily pass in a mocked inject func
 ### Dependency injections
 
 As mentioned above, dependency injections are done with the `inject` function, provided to your component's factory as the first argument. This function can also be passed on if you find a need for that, for example into a class constructor, up to you!  
-The function doesn't guarantee any type information on its own. This seems like a downside at first but is what enables us to perform IoC well. You see, we don't want to touch the implementation in the injection process, we just want the ID so that we can keep them decoupled. The type <-> id pair will be kept in a bindings file, close to each other, so it's easy to find and use.
+The function doesn't guarantee any type information on its own. This seems like a downside at first but is what gives us true decoupling. You see, we don't want to touch the implementation in the injection process, that would make us depend on that implementation. We just want the ID and the interface, so that we can keep our component decoupled from the other component's implementation. This way, the interface also forms a sort of contract between our components.  
+The type <-> id pair will be kept in a bindings file, close to each other, so it's easy to find and use.
 
 ### Bindings
 
