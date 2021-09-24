@@ -6,7 +6,7 @@ _A tiny inversion of control container for all coding styles_
 
 ## Overview
 
-Tinioc gives you the main benefits of inversion of control (IoC) in a simple, minimal package. This means that you'll get:
+Tinioc gives you the main benefits of inversion of control (IoC) in a simple, minimal package.
 
 - Decoupling
 - Ease of testing
