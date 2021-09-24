@@ -55,7 +55,7 @@ export class Container {
 
   /**
    * Check if there is a binding for a given id.
-   * This will check this container and also all of its parents.
+   * This will check this container and also all of it's parents.
    *
    * Example:
    * ```ts
@@ -84,7 +84,7 @@ export class Container {
 
   /**
    * Removes the binding for the given id.
-   * This will only remove it in this container.
+   * This will only remove it from this container.
    *
    * Example:
    * ```ts
