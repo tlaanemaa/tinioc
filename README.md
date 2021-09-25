@@ -35,7 +35,7 @@ export const myComponent = (inject: Inject): IMyComponent => ({
 ```
 
 As you can see, injecting a dependency is as easy as calling a function, and it's also type-safe if you're using typescript!
-You may notice that we use an id and a type separately to inject the logger here, this is how we get the IoC benefits. The concrete logger implementation isn't mentioned anywhere so we can change the implementation and as long as it fits within the same interface, we're good! Our dependant components are happy because they get a dependency whose interface they can trust and our dependency is happy because it's free to change within that interface. Decoupling!
+You may notice that we use an id and a type separately to inject the logger here, this is how we get the decoupling benefits. The concrete logger implementation isn't mentioned anywhere so we can change the implementation and as long as it fits within the same interface, we're good! Our dependant components are happy because they get a dependency whose interface they can trust and our dependency is happy because it's free to change within that interface. Decoupling!
 
 There are also testing benefits here, we can easily pass in a mocked inject function that returns mocked dependencies.
 
@@ -105,7 +105,7 @@ container.bind<bindings.INumbersDB>(bindings.NUMBERS_DB, numbersDB);
 container.bind<bindings.IMyComponent>(bindings.MY_COMPONENT, myComponent);
 ```
 
-That's it! Now you've got a fully functional IoC container set up.  
+That's it! Now you've got a fully functional dependency injection container set up.  
 For smaller applications, it's usually enough to use a single global container but you can also split your project into submodules with each having its own container. Then, if one submodule needs to access dependencies from another, you'll just use `container.extend` to create a parent-child relationship between them.
 
 ### Getting access to the components
