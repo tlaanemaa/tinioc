@@ -23,7 +23,7 @@ Here's an example of how the injector function is used to inject a dependency in
 // myComponent.ts
 
 import { Inject } from "tinioc";
-import { INumbersDB, NUMBERS_DB } from "../bindings";
+import { IMyComponent, INumbersDB, NUMBERS_DB } from "../bindings";
 
 export const myComponent = (inject: Inject): IMyComponent => ({
   getMyFavoriteNumber: async () => {
@@ -35,7 +35,7 @@ export const myComponent = (inject: Inject): IMyComponent => ({
 ```
 
 As you can see, injecting a dependency is as easy as calling a function, and it's also type-safe if you're using typescript!
-You may notice that we use an id and a type separately to inject the logger here, this is how we get the decoupling benefits. The concrete logger implementation isn't mentioned anywhere so we can change the implementation and as long as it fits within the same interface, we're good! Our dependant components are happy because they get a dependency whose interface they can trust and our dependency is happy because it's free to change within that interface. Decoupling!
+You may notice that we use an id and a type separately to inject the `numbersDB` here, this is how we get the decoupling benefits. The concrete `numbersDB` implementation isn't mentioned anywhere so we can change the implementation and as long as it fits within the same interface, we're good! Our dependant components are happy because they get a dependency whose interface they can trust and our dependency is happy because it's free to change within that interface. Decoupling!
 
 There are also testing benefits here, we can easily pass in a mocked inject function that returns mocked dependencies.
 
