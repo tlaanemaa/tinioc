@@ -1,6 +1,6 @@
 {
   "name": "tinioc",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "A tiny dependency injection container for all coding styles",
   "main": "./dist/main.js",
   "types": "./dist/main.d.ts",
