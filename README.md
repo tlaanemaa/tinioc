@@ -6,7 +6,7 @@ _A tiny dependency injection container for all coding styles_
 
 ## Overview
 
-Tinioc gives you the main benefits of dependency injection in a simple, minimal package.
+Tinioc gives you the main benefits of dependency injection in a simple, minimal package:
 
 - Decoupling
 - Ease of testing
