@@ -160,7 +160,7 @@ export class Container {
    * The new container will have this container as the only parent.
    *
    * Child containers are very useful when you want to bind something for a single run,
-   * for example, if you've got request context you want to bind to the container before getting your service.
+   * for example, if you've got request context you want to bind to the container before getting your component.
    * Using child containers allows you to bind these temporary values without polluting the root container.
    *
    * Example:

@@ -15,7 +15,7 @@ Tinioc gives you the main benefits of dependency injection in a simple, minimal 
 
 Dependency injection brings massive benefits but applying it often means using a library that does things under the hood which might not be obvious, some magic is happening. This tends to drive people away because, as engineers, we like to know how our stuff works. That is compounded by the fact that dependency injection libraries often constraint you to some specific coding style, most often object-oriented design with classes.
 
-Tinioc solves that. The library's dead simple, you can easily go through the whole container implementation in one sitting, [have a look](https://github.com/tlaanemaa/tinioc/blob/main/src/container.ts)! It also sets almost no constraints on your coding style, you can use functions or classes or whatever you like to use. The only constraint placed is that your components should be registered as factory functions, within that constraint you're free to do whatever you want. This simplicity and freedom are enabled by the simple concept of an injector function. Tinioc doesn't build dependency graphs, it doesn't even deal with dependency scopes, all it does is give you an injector function to inject your dependencies where you need them. This way you're free to use it however you want.
+Tinioc solves that. The library's dead simple, you can easily go through the whole container implementation in one sitting, [see for yourself](https://github.com/tlaanemaa/tinioc/blob/main/src/container.ts)! It also sets almost no constraints on your coding style, you can use functions or classes or whatever you like to use. The only constraint placed is that your components should be registered as factory functions, within that constraint you're free to do whatever you want. This simplicity and freedom are enabled by the simple concept of an injector function. Tinioc doesn't build dependency graphs, it doesn't even deal with dependency scopes, all it does is give you an injector function to inject your dependencies where you need them. This way you're free to use it however you want.
 
 Here's an example of how the injector function is used to inject a dependency into a component:
 
@@ -42,12 +42,13 @@ There are also testing benefits here, we can easily pass in a mocked inject func
 ### Dependency injections
 
 As mentioned above, dependency injections are done with the `inject` function, provided to your component's factory as the first argument. This function can also be passed on if you find a need for that, for example into a class constructor, up to you!  
-The function doesn't guarantee any type information on its own. This seems like a downside at first but is what gives us true decoupling. You see, we don't want to touch the implementation in the injection process, that would make us depend on that implementation. We just want the ID and the interface, so that we can keep our component decoupled from the other component's implementation. This way, the interface also forms a sort of contract between our components.  
-The type <-> id pair will be kept in a bindings file, close to each other, so it's easy to find and use.
+The function doesn't guarantee any type information on its own. This seems like a downside at first but is what gives us true decoupling. You see, we don't want to touch the implementation in the injection process, that would make us depend on that implementation. We just want the ID and the interface, so that we can keep our component decoupled from the other component's implementation. This way, the interface also forms a sort of contract between our components.
+
+The id <-> type pair will be kept in a bindings file, close to each other, so it's easy to find and use.
 
 ### Bindings
 
-An Id <-> type pair looks something like this:
+An id <-> type pair looks something like this:
 
 ```ts
 // bindings.ts
@@ -97,7 +98,7 @@ To facilitate the injection, we need a dependency injection container. This is a
 import { Container } from "tinioc";
 import * as bindings from "./bindings";
 import { numbersDB } from "./numbersDB";
-import { myComponent } from "./database/numbersDB";
+import { myComponent } from "./myComponent";
 
 export const container = new Container();
 
@@ -237,7 +238,7 @@ This is effectively the reverse of extending.
 The new container will have this container as the only parent.
 
 Child containers are very useful when you want to bind something for a single run,
-for example, if you've got request context you want to bind to the container before getting your service.
+for example, if you've got request context you want to bind to the container before getting your component.
 Using child containers allows you to bind these temporary values without polluting the root container.
 
 Example:
