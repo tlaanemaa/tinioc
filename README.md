@@ -23,7 +23,7 @@ Here's an example of how the injector function is used to inject a dependency in
 // myComponent.ts
 
 import { Inject } from "tinioc";
-import { IMyComponent, INumbersDB, NUMBERS_DB } from "../bindings";
+import { IMyComponent, INumbersDB, NUMBERS_DB } from "./bindings";
 
 export const myComponent = (inject: Inject): IMyComponent => ({
   getMyFavoriteNumber: async () => {
@@ -55,13 +55,13 @@ An id <-> type pair looks something like this:
 
 export const NUMBERS_DB = Symbol.for("numbers_db");
 export interface INumbersDB {
-  getById(id: string): number | undefined;
-  setById(id: string, value: number): void;
+  getById(id: string): Promise<number | undefined>;
+  setById(id: string, value: number): Promise<void>;
 }
 
 export const MY_COMPONENT = Symbol.for("my_component");
 export interface IMyComponent {
-  getMyFavoriteNumber(): number;
+  getMyFavoriteNumber(): Promise<number>;
 }
 ```
 
@@ -74,7 +74,7 @@ Nevertheless, here's an example of that:
 // myComponent.ts
 
 import { Inject } from "tinioc";
-import { INumbersDB, NUMBERS_DB } from "../bindings";
+import { INumbersDB, NUMBERS_DB } from "./bindings";
 
 export const myComponent = (inject: Inject) => ({
   getMyFavoriteNumber: async () => {
@@ -136,11 +136,16 @@ Now, let's say you want to put some request context into the container before yo
 // controller.ts
 
 import { RequestHandler } from "express";
-import { IMyComponent, MY_COMPONENT } from "./bindings";
+import {
+  IMyComponent,
+  MY_COMPONENT,
+  IRequestContext,
+  REQUEST_CONTEXT,
+} from "./bindings";
 import { container } from "./container";
 
 export const controller: RequestHandler = async (req, res, next) => {
-  const ctx = { correlationId: req.header("correlation-id") };
+  const ctx = { correlationId: req.header("correlation-id") ?? "missing" };
   const myFavoriteNumber = await container
     .createChild()
     .bind<IRequestContext>(REQUEST_CONTEXT, () => ctx)
@@ -191,7 +196,7 @@ And this is how you'd inject it:
 // myComponent.ts
 
 import { Inject } from "tinioc";
-import { IMyComponent, IDbClient, DB_CLIENT } from "../bindings";
+import { IMyComponent, IDbClient, DB_CLIENT } from "./bindings";
 
 export const myComponent = (inject: Inject): IMyComponent => ({
   getMyFavoriteNumber: async () => {
