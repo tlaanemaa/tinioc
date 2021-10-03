@@ -155,6 +155,55 @@ And just like that, you've got your request context available everywhere within 
 
 If for some reason the component is not found, a `BindingNotFoundError` will be thrown. You can also import that error class from `tinioc` and use it in `instanceof` checks to handle that specific error if you wish.
 
+### Async components
+
+Thanks to tinioc's simplicity, working with async components is essentially the same as with regular components. Since an async component is just a component wrapped in a promise, then you can just type it like that in the bindings file, and then `await` the injection.
+
+Here's an example of how you'd define a connected [pg](https://www.npmjs.com/package/pg) client as a singleton component:
+
+```ts
+// dbClient.ts
+
+import { Client } from "pg";
+import { IDbClient } from "./bindings";
+
+/**
+ * Creates and connects a pg client
+ */
+const getConnectedClient = async () => {
+  const client = new Client();
+  await client.connect();
+  return client;
+};
+
+/*
+  IDbClient is just Promise<Client>.
+  It's recommended to be defined in the bindings file, as opposed to here, 
+  for the above-mentioned decoupling benefits.
+*/
+const client = getConnectedClient();
+export const dbClient = (): IDbClient => client;
+```
+
+And this is how you'd inject it:
+
+```ts
+// myComponent.ts
+
+import { Inject } from "tinioc";
+import { IMyComponent, IDbClient, DB_CLIENT } from "../bindings";
+
+export const myComponent = (inject: Inject): IMyComponent => ({
+  getMyFavoriteNumber: async () => {
+    const client = await inject<IDbClient>(DB_CLIENT);
+    const res = await client.query("SELECT 7 as favoriteNumber");
+    return res.rows[0].favoriteNumber;
+  },
+});
+```
+
+As you can see, there's nothing special to it. Easy-peasy!
+
 ## Container API
 
 ### container.bind()
