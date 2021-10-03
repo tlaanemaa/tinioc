@@ -162,9 +162,25 @@ If for some reason the component is not found, a `BindingNotFoundError` will be 
 
 ### Async components
 
-Thanks to tinioc's simplicity, working with async components is essentially the same as with regular components. Since an async component is just a component wrapped in a promise, then you can just type it like that in the bindings file, and then `await` the injection.
+Thanks to tinioc's simplicity, working with async components is essentially the same as with regular components. An async component is just a component wrapped in a promise so you can just type it like that in the bindings file, and then `await` the injection.
 
-Here's an example of how you'd define a connected [pg](https://www.npmjs.com/package/pg) client as a singleton component:
+Here's how you'd define the bindings for a connected [pg](https://www.npmjs.com/package/pg) client:
+
+```ts
+// bindings.ts
+
+import { Client } from "pg";
+
+export const DB_CLIENT = Symbol.for("db_client");
+export type IDbClient = Promise<Client>;
+
+export const MY_COMPONENT = Symbol.for("my_component");
+export interface IMyComponent {
+  getMyFavoriteNumber(): Promise<number>;
+}
+```
+
+Here's how you'd implement it as a singleton component:
 
 ```ts
 // dbClient.ts
@@ -181,16 +197,11 @@ const getConnectedClient = async () => {
   return client;
 };
 
-/*
-  IDbClient is just Promise<Client>.
-  It's recommended to be defined in the bindings file, as opposed to here, 
-  for the above-mentioned decoupling benefits.
-*/
 const client = getConnectedClient();
 export const dbClient = (): IDbClient => client;
 ```
 
-And this is how you'd inject it:
+And here's is how you'd inject it:
 
 ```ts
 // myComponent.ts
