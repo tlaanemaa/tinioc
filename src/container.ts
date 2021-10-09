@@ -37,7 +37,7 @@ export class Container {
    *
    * Example:
    * ```ts
-   * container.bind<IMyComponent>(MY_COMPONENT, myComponent)
+   * container.register<IMyComponent>(MY_COMPONENT, myComponent)
    * ```
    * ---
    * The registered binding can later be injected with the `inject` function like so:
@@ -48,37 +48,37 @@ export class Container {
    * preferably in a separate `bindings` file. That makes them easy to use and improves
    * maintainability.
    */
-  public bind<T>(id: ID, value: FactoryOf<T>): this {
+  public register<T>(id: ID, value: FactoryOf<T>): this {
     this.bindings.set(id, value);
     return this;
   }
 
   /**
-   * Check if there is a binding for a given id.
+   * Check if there is a binding registered for a given id.
    * This will check this container and also all of it's parents.
    *
    * Example:
    * ```ts
-   * const myComponentIsBound = container.isBound(MY_COMPONENT)
+   * const myComponentIsRegistered = container.isRegistered(MY_COMPONENT)
    * ```
    */
-  public isBound(id: ID): boolean {
+  public isRegistered(id: ID): boolean {
     return (
-      this.isCurrentBound(id) ||
-      this.parents.some((parent) => parent.isBound(id))
+      this.isRegisteredHere(id) ||
+      this.parents.some((parent) => parent.isRegistered(id))
     );
   }
 
   /**
-   * Check if there is a binding for a given id.
+   * Check if there is a binding registered for a given id.
    * This will check only this container.
    *
    * Example:
    * ```ts
-   * const myComponentIsBound = container.isCurrentBound(MY_COMPONENT)
+   * const myComponentIsRegistered = container.isRegisteredHere(MY_COMPONENT)
    * ```
    */
-  public isCurrentBound(id: ID): boolean {
+  public isRegisteredHere(id: ID): boolean {
     return this.bindings.has(id);
   }
 
@@ -88,10 +88,10 @@ export class Container {
    *
    * Example:
    * ```ts
-   * container.unbind(MY_COMPONENT)
+   * container.remove(MY_COMPONENT)
    * ```
    */
-  public unbind(id: ID): this {
+  public remove(id: ID): this {
     this.bindings.delete(id);
     return this;
   }

@@ -17,9 +17,9 @@ describe("Container instance", () => {
     const container = new Container();
 
     it("should bind a component into the container", () => {
-      expect(container.isBound(ADDER)).toBe(false);
-      container.bind<Adder>(ADDER, adder);
-      expect(container.isBound(ADDER)).toBe(true);
+      expect(container.isRegistered(ADDER)).toBe(false);
+      container.register<Adder>(ADDER, adder);
+      expect(container.isRegistered(ADDER)).toBe(true);
     });
   });
 
@@ -36,15 +36,15 @@ describe("Container instance", () => {
     });
 
     const container = new Container();
-    container.bind<Adder>(ADDER, adder);
+    container.register<Adder>(ADDER, adder);
 
     it("return true if component is bound in the container", () => {
-      expect(container.isBound(ADDER)).toBe(true);
+      expect(container.isRegistered(ADDER)).toBe(true);
     });
 
     it("should return true if component is bound in the parent container", () => {
       const childContainer = container.createChild();
-      expect(childContainer.isBound(ADDER)).toBe(true);
+      expect(childContainer.isRegistered(ADDER)).toBe(true);
     });
   });
 
@@ -61,15 +61,15 @@ describe("Container instance", () => {
     });
 
     const container = new Container();
-    container.bind<Adder>(ADDER, adder);
+    container.register<Adder>(ADDER, adder);
 
     it("return true if component is bound in the container", () => {
-      expect(container.isCurrentBound(ADDER)).toBe(true);
+      expect(container.isRegisteredHere(ADDER)).toBe(true);
     });
 
     it("should return false if component is bound in the parent container", () => {
       const childContainer = container.createChild();
-      expect(childContainer.isCurrentBound(ADDER)).toBe(false);
+      expect(childContainer.isRegisteredHere(ADDER)).toBe(false);
     });
   });
 
@@ -87,35 +87,35 @@ describe("Container instance", () => {
 
     it("should unbind the component from the container", () => {
       const container = new Container();
-      container.bind<Adder>(ADDER, adder);
+      container.register<Adder>(ADDER, adder);
 
-      expect(container.isBound(ADDER)).toBe(true);
-      container.unbind(ADDER);
-      expect(container.isBound(ADDER)).toBe(false);
+      expect(container.isRegistered(ADDER)).toBe(true);
+      container.remove(ADDER);
+      expect(container.isRegistered(ADDER)).toBe(false);
     });
 
     it("should not unbind the component from a parent container", () => {
       const container = new Container();
-      container.bind<Adder>(ADDER, adder);
+      container.register<Adder>(ADDER, adder);
       const childContainer = container.createChild();
 
-      expect(childContainer.isBound(ADDER)).toBe(true);
-      childContainer.unbind(ADDER);
-      expect(childContainer.isBound(ADDER)).toBe(true);
-      expect(childContainer.isCurrentBound(ADDER)).toBe(false);
+      expect(childContainer.isRegistered(ADDER)).toBe(true);
+      childContainer.remove(ADDER);
+      expect(childContainer.isRegistered(ADDER)).toBe(true);
+      expect(childContainer.isRegisteredHere(ADDER)).toBe(false);
     });
 
     it("should not unbind other components from the container", () => {
       const ADDER2 = Symbol.for("adder2");
       const container = new Container();
-      container.bind<Adder>(ADDER, adder);
-      container.bind<Adder>(ADDER2, adder);
+      container.register<Adder>(ADDER, adder);
+      container.register<Adder>(ADDER2, adder);
 
-      expect(container.isBound(ADDER)).toBe(true);
-      expect(container.isBound(ADDER2)).toBe(true);
-      container.unbind(ADDER);
-      expect(container.isBound(ADDER)).toBe(false);
-      expect(container.isBound(ADDER2)).toBe(true);
+      expect(container.isRegistered(ADDER)).toBe(true);
+      expect(container.isRegistered(ADDER2)).toBe(true);
+      container.remove(ADDER);
+      expect(container.isRegistered(ADDER)).toBe(false);
+      expect(container.isRegistered(ADDER2)).toBe(true);
     });
   });
 
@@ -143,10 +143,10 @@ describe("Container instance", () => {
         return { num2: 5 };
       };
 
-      // Component bindings
+      // Component registrations
       const container = new Container();
-      container.bind<Adder>(ADDER, adder);
-      container.bind<NumberCarrier>(NUMBER_CARRIER, numberCarrier);
+      container.register<Adder>(ADDER, adder);
+      container.register<NumberCarrier>(NUMBER_CARRIER, numberCarrier);
 
       it("should find a known component", () => {
         const component = container.get<Adder>(ADDER);
@@ -188,10 +188,10 @@ describe("Container instance", () => {
         return { getNum2 };
       };
 
-      // Component bindings
+      // Component registrations
       const container = new Container();
-      container.bind<Adder>(ADDER, adder);
-      container.bind<NumberCarrier>(NUMBER_CARRIER, numberCarrier);
+      container.register<Adder>(ADDER, adder);
+      container.register<NumberCarrier>(NUMBER_CARRIER, numberCarrier);
 
       it("should find a known component", () => {
         const component = container.get<Adder>(ADDER);
@@ -234,18 +234,18 @@ describe("Container instance", () => {
       baguette: 5,
     });
 
-    // Container bindings
+    // Container registrations
     const baseContainer1 = new Container();
-    baseContainer1.bind<Messages>(MESSAGES, messages);
+    baseContainer1.register<Messages>(MESSAGES, messages);
     const baseContainer2 = new Container();
-    baseContainer2.bind<Numbers>(NUMBERS, numbers);
+    baseContainer2.register<Numbers>(NUMBERS, numbers);
 
     describe("when extended with 2 containers, separately", () => {
       const container = new Container();
       container.extend(baseContainer1);
       container.extend(baseContainer2);
       container.extend(baseContainer1); // This is used to test the uniqueness
-      container.bind<Breads>(BREADS, breads);
+      container.register<Breads>(BREADS, breads);
 
       it("should push provided unique containers to the parents array", () => {
         expect(container.parents).toStrictEqual([
@@ -291,9 +291,9 @@ describe("Container instance", () => {
       PI: 3.14,
     });
 
-    // Root container component bindings
+    // Root container component registrations
     const container = new Container();
-    container.bind<Messages>(MESSAGES, messages);
+    container.register<Messages>(MESSAGES, messages);
     const childContainer = container.createChild();
 
     it("should return a new container", () => {
@@ -301,7 +301,7 @@ describe("Container instance", () => {
     });
 
     describe("grandchild container", () => {
-      childContainer.bind<Numbers>(NUMBERS, numbers);
+      childContainer.register<Numbers>(NUMBERS, numbers);
       const grandChildContainer = childContainer.createChild();
 
       it("should find components from the original parent container", () => {
