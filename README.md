@@ -102,8 +102,8 @@ import { myComponent } from "./myComponent";
 
 export const container = new Container();
 
-container.bind<bindings.INumbersDB>(bindings.NUMBERS_DB, numbersDB);
-container.bind<bindings.IMyComponent>(bindings.MY_COMPONENT, myComponent);
+container.register<bindings.INumbersDB>(bindings.NUMBERS_DB, numbersDB);
+container.register<bindings.IMyComponent>(bindings.MY_COMPONENT, myComponent);
 ```
 
 That's it! Now you've got a fully functional dependency injection container set up.  
@@ -148,7 +148,7 @@ export const controller: RequestHandler = async (req, res, next) => {
   const ctx = { correlationId: req.header("correlation-id") ?? "missing" };
   const myFavoriteNumber = await container
     .createChild()
-    .bind<IRequestContext>(REQUEST_CONTEXT, () => ctx)
+    .register<IRequestContext>(REQUEST_CONTEXT, () => ctx)
     .get<IMyComponent>(MY_COMPONENT)
     .getMyFavoriteNumber();
 
@@ -222,7 +222,7 @@ As you can see, there's nothing special to it. Easy-peasy!
 
 ## Container API
 
-### container.bind()
+### container.register()
 
 Register an id with a component in the container.
 
@@ -232,7 +232,7 @@ registered component matches the required interface.
 Example:
 
 ```ts
-container.bind<IMyComponent>(MY_COMPONENT, myComponent);
+container.register<IMyComponent>(MY_COMPONENT, myComponent);
 ```
 
 The registered binding can later be injected with the `inject` function like so:
@@ -245,29 +245,29 @@ It is suggested you keep your dependency ids and types close to each other,
 preferably in a separate `bindings` file. That makes them easy to use and improves
 maintainability.
 
-### container.isBound()
+### container.isRegistered()
 
-Check if there is a binding for a given id.
-This will check this container and also all of its parents.
+Check if there is a binding registered for a given id.
+This will check this container and also all of it's parents.
 
 Example:
 
 ```ts
-const myComponentIsBound = container.isBound(MY_COMPONENT);
+const myComponentIsRegistered = container.isRegistered(MY_COMPONENT);
 ```
 
-### container.isCurrentBound()
+### container.isRegisteredHere()
 
-Check if there is a binding for a given id.
+Check if there is a binding registered for a given id.
 This will check only this container.
 
 Example:
 
 ```ts
-const myComponentIsBound = container.isCurrentBound(MY_COMPONENT);
+const myComponentIsRegistered = container.isRegisteredHere(MY_COMPONENT);
 ```
 
-### container.unbind()
+### container.remove()
 
 Removes the binding for the given id.
 This will only remove it from this container.
@@ -275,7 +275,7 @@ This will only remove it from this container.
 Example:
 
 ```ts
-container.unbind(MY_COMPONENT);
+container.remove(MY_COMPONENT);
 ```
 
 ### container.get()
@@ -302,9 +302,9 @@ Creates and returns a child container.
 This is effectively the reverse of extending.
 The new container will have this container as the only parent.
 
-Child containers are very useful when you want to bind something for a single run,
-for example, if you've got request context you want to bind to the container before getting your component.
-Using child containers allows you to bind these temporary values without polluting the root container.
+Child containers are very useful when you want to register something for a single run,
+for example, if you've got request context you want to register to the container before getting your component.
+Using child containers allows you to register these temporary values without polluting the root container.
 
 Example:
 
@@ -348,10 +348,10 @@ declare type FactoryOf<T> = (inject: Inject) => T;
 
 declare class Container {
   parents: Container[];
-  bind<T>(id: ID, value: FactoryOf<T>): this;
-  isBound(id: ID): boolean;
-  isCurrentBound(id: ID): boolean;
-  unbind(id: ID): this;
+  register<T>(id: ID, value: FactoryOf<T>): this;
+  isRegistered(id: ID): boolean;
+  isRegisteredHere(id: ID): boolean;
+  remove(id: ID): this;
   get<T>(id: ID): T;
   extend(...containers: Container[]): this;
   createChild(): Container;
