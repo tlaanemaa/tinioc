@@ -12,6 +12,7 @@ Tinioc gives you the main benefits of dependency injection in a simple, minimal 
 - Ease of testing
 - Almost no constraints on your coding style
 - A simple dependency injection container that's easy to understand
+- No decorators, tinioc works just as well in plain JavaScript
 
 Dependency injection brings massive benefits but applying it often means using a library that does things under the hood which might not be obvious, some magic is happening. This tends to drive people away because, as engineers, we like to know how our stuff works. That is compounded by the fact that dependency injection libraries often constraint you to some specific coding style, most often object-oriented design with classes.
 
