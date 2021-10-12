@@ -1,5 +1,10 @@
 import { BindingNotFoundError } from "./binding-not-found-error";
-import { ID, FactoryOf, AnyFactory } from "./types";
+import { ID, FactoryOf } from "./types";
+
+/**
+ * Helper type to describe unknown component factories
+ */
+type UnknownFactory = FactoryOf<unknown>;
 
 export class Container {
   /**
@@ -10,7 +15,7 @@ export class Container {
    * make your container "inherit" from several other containers
    */
   public parents: Container[] = [];
-  private readonly bindings = new Map<ID, AnyFactory>();
+  private readonly bindings = new Map<ID, UnknownFactory>();
 
   /**
    * Register an id with a component in the container.
@@ -82,7 +87,7 @@ export class Container {
   /**
    * Recursively searches for the binding in this container and it's parents
    */
-  private findBinding(id: ID): AnyFactory | undefined {
+  private findBinding(id: ID): UnknownFactory | undefined {
     if (this.bindings.has(id)) return this.bindings.get(id);
 
     for (let i = 0; i < this.parents.length; i += 1) {
@@ -109,7 +114,7 @@ export class Container {
     const binding = this.findBinding(id);
     if (binding === undefined) throw new BindingNotFoundError(id);
 
-    return binding(this.get.bind(this));
+    return binding(this.get.bind(this)) as T;
   }
 
   /**
