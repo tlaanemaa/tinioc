@@ -1,5 +1,6 @@
-import { Container, Inject } from "./container";
-import { BindingNotFoundError } from "./utils";
+import { Container } from "./container";
+import { Inject } from "./types";
+import { BindingNotFoundError } from "./binding-not-found-error";
 
 describe("Container instance", () => {
   describe("bind", () => {

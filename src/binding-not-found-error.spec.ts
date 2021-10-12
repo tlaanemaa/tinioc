@@ -1,4 +1,4 @@
-import { BindingNotFoundError } from "./utils";
+import { BindingNotFoundError } from "./binding-not-found-error";
 
 describe("BindingNotFoundError", () => {
   describe("when called with a string", () => {

@@ -1,22 +1,5 @@
-import { BindingNotFoundError } from "./utils";
-
-/**
- * ID type used for binding and injecting components.
- */
-export type ID = string | symbol;
-
-/**
- * Type of the injector function passed to component factories as the first argument
- */
-export type Inject = <T>(id: ID) => T;
-
-/**
- * Utility type to derive the component factory type from a component type
- */
-type FactoryOf<T> = (inject: Inject) => T;
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyFactory = FactoryOf<any>;
+import { BindingNotFoundError } from "./binding-not-found-error";
+import { ID, FactoryOf, AnyFactory } from "./types";
 
 export class Container {
   /**
