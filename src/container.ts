@@ -1,10 +1,22 @@
+import { ID, FactoryOf, ValueOf } from "./types";
+import { Scope } from "./scope";
+import { SCOPES } from "./constants";
 import { BindingNotFoundError } from "./binding-not-found-error";
-import { ID, FactoryOf } from "./types";
 
 /**
- * Helper type to describe unknown component factories
+ * Helper type to describe a general binding
  */
-type UnknownFactory = FactoryOf<unknown>;
+interface Binding {
+  factory: FactoryOf<unknown>;
+  scope: ValueOf<typeof SCOPES>;
+}
+
+/**
+ * Component registration options
+ */
+interface RegistrationOptions {
+  scope?: ValueOf<typeof SCOPES>;
+}
 
 export class Container {
   /**
@@ -15,7 +27,8 @@ export class Container {
    * make your container "inherit" from several other containers
    */
   public parents: Container[] = [];
-  private readonly bindings = new Map<ID, UnknownFactory>();
+  private readonly bindings = new Map<ID, Binding>();
+  private readonly singletonScope = new Scope();
 
   /**
    * Register an id with a component in the container.
@@ -36,8 +49,15 @@ export class Container {
    * preferably in a separate `bindings` file. That makes them easy to use and improves
    * maintainability.
    */
-  public register<T>(id: ID, value: FactoryOf<T>): this {
-    this.bindings.set(id, value);
+  public register<T>(
+    id: ID,
+    factory: FactoryOf<T>,
+    options: RegistrationOptions = {}
+  ): this {
+    this.bindings.set(id, {
+      factory,
+      scope: options.scope ?? SCOPES.transient,
+    });
     return this;
   }
 
@@ -87,7 +107,7 @@ export class Container {
   /**
    * Recursively searches for the binding in this container and it's parents
    */
-  private findBinding(id: ID): UnknownFactory | undefined {
+  private findBinding(id: ID): Binding | undefined {
     if (this.bindings.has(id)) return this.bindings.get(id);
 
     for (let i = 0; i < this.parents.length; i += 1) {
@@ -111,10 +131,29 @@ export class Container {
    * ```
    */
   public get<T>(id: ID): T {
-    const binding = this.findBinding(id);
-    if (binding === undefined) throw new BindingNotFoundError(id);
+    const requestScope = this.singletonScope.createChild();
 
-    return binding(this.get.bind(this)) as T;
+    /**
+     * An injector function to inject dependencies into your components
+     */
+    const inject = <T>(id: ID): T => {
+      if (requestScope.has(id)) return requestScope.get(id) as T;
+
+      const binding = this.findBinding(id);
+      if (binding === undefined) throw new BindingNotFoundError(id);
+
+      const instance = binding.factory(inject);
+
+      if (binding.scope === SCOPES.singleton) {
+        this.singletonScope.set(id, instance);
+      } else if (binding.scope === SCOPES.request) {
+        requestScope.set(id, instance);
+      }
+
+      return instance as T;
+    };
+
+    return inject<T>(id);
   }
 
   /**
