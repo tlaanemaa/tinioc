@@ -12,3 +12,8 @@ export type Inject = <T>(id: ID) => T;
  * Utility type to derive the component factory type from a component type
  */
 export type FactoryOf<T> = (inject: Inject) => T;
+
+/**
+ * Utility type to derive values from an object type
+ */
+export type ValueOf<T> = T[keyof T];
