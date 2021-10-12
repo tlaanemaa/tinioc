@@ -79,11 +79,14 @@ export class Container {
     return this;
   }
 
-  private _get(id: ID): AnyFactory | undefined {
+  /**
+   * Recursively searches for the binding in this container and it's parents
+   */
+  private findBinding(id: ID): AnyFactory | undefined {
     if (this.bindings.has(id)) return this.bindings.get(id);
 
     for (let i = 0; i < this.parents.length; i += 1) {
-      const binding = this.parents[i]._get(id);
+      const binding = this.parents[i].findBinding(id);
       if (binding !== undefined) return binding;
     }
   }
@@ -103,7 +106,7 @@ export class Container {
    * ```
    */
   public get<T>(id: ID): T {
-    const binding = this._get(id);
+    const binding = this.findBinding(id);
     if (binding === undefined) throw new BindingNotFoundError(id);
 
     return binding(this.get.bind(this));
